@@ -2,6 +2,7 @@
 
 import axios from "axios"
 import { useState } from "react"
+import Link  from "next/link"
 
 export default function Login() {
 
@@ -123,7 +124,10 @@ export default function Login() {
 
       <p className="text-center text-xs text-white/50 mt-6">
         Don't have an account?{" "}
-        <a href="#" className="text-white font-medium hover:text-fuchsia-300">Sign up</a>
+        <button>
+            
+        <Link href="/signup" className="text-white font-medium hover:text-fuchsia-300">Sign up</Link>
+        </button>
       </p>
     </div>
   </div>

@@ -2,6 +2,7 @@
 
 import axios from "axios"
 import { useState } from "react";
+import Link  from "next/link"
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -9,7 +10,7 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
 
-  const handleForm = (e) => {
+  const handleForm = (e:any) => {
     e.preventDefault();
     // your signup logic
   };
@@ -148,9 +149,9 @@ export default function Signup() {
 
         <p className="mt-6 text-center text-sm text-white/60">
           Already have an account?{" "}
-          <a href="#" className="font-medium text-fuchsia-300 hover:underline">
+          <Link href="/login" className="font-medium text-fuchsia-300 hover:underline">
             Log in
-          </a>
+          </Link>
         </p>
       </div>
     </div>
