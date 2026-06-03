@@ -3,13 +3,13 @@
 import axios from "axios"
 import { useState } from "react"
 import Link  from "next/link"
-
+import { useRouter } from "next/navigation"
 export default function Login() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-
-  async function handleForm(e: React.FormEvent) {
+  const router= useRouter()
+  async function handleForm(e:any) {
     e.preventDefault()
 
     const response = await axios.post("/api/auth/login", {
@@ -17,8 +17,21 @@ export default function Login() {
       password,
     })
 
+    if(response.data.role=="ADMIN")
+    {
+      router.push("/admin")
+    }
     console.log(response.data)
-  }
+  
+
+if (response.data.role === "SELLER") {
+  router.push("/seller")
+}
+
+if (response.data.role === "BUYER") {
+  router.push("/buyer")
+}
+}
 
   return (
    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0b0b1a]">
