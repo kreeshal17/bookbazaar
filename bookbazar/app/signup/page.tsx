@@ -1,159 +1,214 @@
 'use client'
 
-import axios from "axios"
-import { useState } from "react";
-import Link  from "next/link"
+import axios from 'axios'
+import Link from 'next/link'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Signup() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  const router = useRouter()
 
-  const handleForm = (e:any) => {
-    e.preventDefault();
-    // your signup logic
-  };
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [role, setRole] = useState('')
+
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
+  const [isError, setIsError] = useState(false)
+
+  async function handleForm(e: React.FormEvent) {
+    e.preventDefault()
+
+    setMessage('')
+
+    if (!name.trim()) {
+      setIsError(true)
+      setMessage('Please enter your full name')
+      return
+    }
+
+    if (!email.trim()) {
+      setIsError(true)
+      setMessage('Please enter your email')
+      return
+    }
+
+    if (!role) {
+      setIsError(true)
+      setMessage('Please select a role')
+      return
+    }
+
+    if (password.length < 8) {
+      setIsError(true)
+      setMessage('Password must be at least 8 characters')
+      return
+    }
+
+    if (password !== confirm) {
+      setIsError(true)
+      setMessage('Passwords do not match')
+      return
+    }
+
+    try {
+      setLoading(true)
+
+      const response = await axios.post('/api/auth/signup', {
+        name,
+        email,
+        password,
+        role,
+      })
+
+      setIsError(false)
+      setMessage(response.data.message)
+
+      setTimeout(() => {
+        router.push('/login')
+      }, 1500)
+    } catch (error: any) {
+      setIsError(true)
+
+      setMessage(
+        error.response?.data?.message || 'Something went wrong'
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0b0b1a] flex items-center justify-center px-4">
-      {/* Animated gradient blobs */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-32 -left-24 h-96 w-96 rounded-full bg-fuchsia-500 opacity-30 blur-3xl mix-blend-screen animate-pulse" />
-        <div className="absolute top-1/3 -right-24 h-[28rem] w-[28rem] rounded-full bg-cyan-400 opacity-25 blur-3xl mix-blend-screen animate-pulse [animation-delay:1s]" />
-        <div className="absolute -bottom-32 left-1/3 h-96 w-96 rounded-full bg-indigo-500 opacity-30 blur-3xl mix-blend-screen animate-pulse [animation-delay:2s]" />
+    <div className="relative min-h-screen bg-[#030712] flex items-center justify-center overflow-hidden px-4">
+
+      {/* Background */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-0 h-96 w-96 rounded-full bg-fuchsia-600/30 blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-cyan-500/30 blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/20 blur-3xl" />
       </div>
 
-      {/* Glass card */}
-      <div className="relative w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-white/40 via-white/10 to-white/5 p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] backdrop-blur-xl">
-        <div className="mb-8 text-center">
-          <h1 className="bg-gradient-to-r from-fuchsia-300 via-white to-cyan-300 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
-            Create account
-          </h1>
-          <p className="mt-2 text-sm text-white/60">
-            Join us — it only takes a minute
-          </p>
-        </div>
+      {/* Card */}
+      <div className="relative w-full max-w-md">
 
-        <form onSubmit={handleForm} className="space-y-5">
-          {/* Name */}
-          <div className="relative">
+        <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl p-8 shadow-2xl">
+
+          <div className="mb-8 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r from-fuchsia-500 via-indigo-500 to-cyan-500 text-white text-2xl font-bold">
+              B
+            </div>
+
+            <h1 className="text-3xl font-bold text-white">
+              Create Account
+            </h1>
+
+            <p className="mt-2 text-sm text-gray-400">
+              Join Book Bazaar today
+            </p>
+          </div>
+
+          <form onSubmit={handleForm} className="space-y-4">
+
             <input
-              id="name"
               type="text"
+              placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder=" "
-              className="peer w-full rounded-xl border border-white/15 bg-white/5 px-4 pt-5 pb-2 text-white placeholder-transparent outline-none transition focus:border-fuchsia-400/60 focus:bg-white/10"
+              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none transition focus:border-fuchsia-500"
             />
-            <label
-              htmlFor="name"
-              className="pointer-events-none absolute left-4 top-2 text-xs text-white/60 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-xs peer-focus:text-fuchsia-300"
-            >
-              Full name
-            </label>
-          </div>
 
-          {/* Email */}
-          <div className="relative">
             <input
-              id="email"
               type="email"
+              placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder=" "
-              className="peer w-full rounded-xl border border-white/15 bg-white/5 px-4 pt-5 pb-2 text-white placeholder-transparent outline-none transition focus:border-fuchsia-400/60 focus:bg-white/10"
+              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none transition focus:border-fuchsia-500"
             />
-            <label
-              htmlFor="email"
-              className="pointer-events-none absolute left-4 top-2 text-xs text-white/60 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-xs peer-focus:text-fuchsia-300"
-            >
-              Email address
-            </label>
-          </div>
 
-          {/* Password */}
-          <div className="relative">
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none focus:border-fuchsia-500"
+            >
+              <option value="" className="text-black">
+                Select Role
+              </option>
+
+              <option value="BUYER" className="text-black">
+                Buyer
+              </option>
+
+              <option value="SELLER" className="text-black">
+                Seller
+              </option>
+            </select>
+
             <input
-              id="password"
               type="password"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder=" "
-              className="peer w-full rounded-xl border border-white/15 bg-white/5 px-4 pt-5 pb-2 text-white placeholder-transparent outline-none transition focus:border-cyan-400/60 focus:bg-white/10"
+              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none transition focus:border-cyan-500"
             />
-            <label
-              htmlFor="password"
-              className="pointer-events-none absolute left-4 top-2 text-xs text-white/60 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-xs peer-focus:text-cyan-300"
-            >
-              Password
-            </label>
-          </div>
 
-          {/* Confirm password */}
-          <div className="relative">
             <input
-              id="confirm"
               type="password"
+              placeholder="Confirm Password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              placeholder=" "
-              className="peer w-full rounded-xl border border-white/15 bg-white/5 px-4 pt-5 pb-2 text-white placeholder-transparent outline-none transition focus:border-cyan-400/60 focus:bg-white/10"
+              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none transition focus:border-cyan-500"
             />
-            <label
-              htmlFor="confirm"
-              className="pointer-events-none absolute left-4 top-2 text-xs text-white/60 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-xs peer-focus:text-cyan-300"
+
+            {message && (
+              <div
+                className={`rounded-xl p-3 text-sm ${
+                  isError
+                    ? 'bg-red-500/15 text-red-300 border border-red-500/20'
+                    : 'bg-green-500/15 text-green-300 border border-green-500/20'
+                }`}
+              >
+                {message}
+              </div>
+            )}
+
+            <button
+              disabled={loading}
+              className="w-full rounded-xl bg-gradient-to-r from-fuchsia-500 via-indigo-500 to-cyan-500 py-3 font-semibold text-white transition hover:scale-[1.02] disabled:opacity-50"
             >
-              Confirm password
-            </label>
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </button>
+          </form>
+
+          <div className="my-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-white/10" />
+            <span className="text-xs text-gray-500">OR</span>
+            <div className="h-px flex-1 bg-white/10" />
           </div>
 
-          {/* Terms */}
-          <label className="flex items-start gap-2 text-xs text-white/60">
-            <input type="checkbox" required className="mt-0.5 accent-fuchsia-500" />
-            <span>
-              I agree to the{" "}
-              <a href="#" className="text-fuchsia-300 hover:underline">Terms</a> and{" "}
-              <a href="#" className="text-cyan-300 hover:underline">Privacy Policy</a>
-            </span>
-          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <button className="rounded-xl border border-white/10 bg-white/5 py-3 text-white hover:bg-white/10">
+              Google
+            </button>
 
-          {/* CTA */}
-          <button
-            type="submit"
-            className="group relative w-full overflow-hidden rounded-xl p-[1px]"
-          >
-            <span className="absolute inset-0 bg-gradient-to-r from-fuchsia-500 via-indigo-500 to-cyan-400" />
-            <span className="relative block rounded-[11px] bg-[#0b0b1a] px-4 py-3 text-sm font-semibold text-white transition group-hover:bg-transparent">
-              Create account
-            </span>
-          </button>
-        </form>
+            <button className="rounded-xl border border-white/10 bg-white/5 py-3 text-white hover:bg-white/10">
+              GitHub
+            </button>
+          </div>
 
-        {/* Divider */}
-        <div className="my-6 flex items-center gap-3 text-xs text-white/40">
-          <div className="h-px flex-1 bg-white/10" />
-          or sign up with
-          <div className="h-px flex-1 bg-white/10" />
+          <p className="mt-6 text-center text-sm text-gray-400">
+            Already have an account?{' '}
+            <Link
+              href="/login"
+              className="font-semibold text-fuchsia-400 hover:text-fuchsia-300"
+            >
+              Login
+            </Link>
+          </p>
+
         </div>
-
-        {/* Social */}
-        <div className="grid grid-cols-2 gap-3">
-          <button className="rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 text-sm text-white/80 transition hover:bg-white/10">
-            Google
-          </button>
-          <button className="rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 text-sm text-white/80 transition hover:bg-white/10">
-            GitHub
-          </button>
-        </div>
-
-        <p className="mt-6 text-center text-sm text-white/60">
-          Already have an account?{" "}
-          <Link href="/login" className="font-medium text-fuchsia-300 hover:underline">
-            Log in
-          </Link>
-        </p>
       </div>
     </div>
-  );
+  )
 }
