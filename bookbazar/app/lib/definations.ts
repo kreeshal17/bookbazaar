@@ -1,6 +1,6 @@
 export type SessionPayload={
 
-id:number
+id:string
 email:string
 role:"ADMIN"|"BUYER" | "SELLER"
 

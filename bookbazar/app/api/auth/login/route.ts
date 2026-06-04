@@ -35,7 +35,7 @@ export async function POST(req:Request){
 
     }
 
-    const user=await prisma.users.findUnique({
+    const user=await prisma.user.findUnique({
     where:{
         email:result.data.email
     },
@@ -51,6 +51,16 @@ export async function POST(req:Request){
 
 
     }
+
+
+    const store = await prisma.store.findUnique({
+  where: {
+    sellerId: user.id
+  }
+})
+
+
+
 
 
 const password=result.data.password
@@ -87,7 +97,8 @@ cookieStore.set('session', token, {
 return Response.json({
   message:"sucessfully submitted",
   role:user.role,
-  email:user.email
+  email:user.email,
+  hasStore:!!store
 
 
     })

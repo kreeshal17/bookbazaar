@@ -33,7 +33,7 @@ const path=req.nextUrl.pathname
 const role=payload.role
 
 
-if(path.startsWith("admin")&& role!="admin")
+if(path.startsWith("/admin")&& role!="ADMIN")
 {
  return NextResponse.redirect(new URL ("/login",req.url))
 
@@ -41,7 +41,7 @@ if(path.startsWith("admin")&& role!="admin")
 }
 
 
-if(path.startsWith("seller") && role!="seller")
+if(path.startsWith("/seller") && role!="SELLER")
 
     {
         return NextResponse.redirect(new URL ("/login",req.url))

@@ -25,7 +25,13 @@ export default function Login() {
   
 
 if (response.data.role === "SELLER") {
-  router.push("/seller")
+
+  if (response.data.hasStore) {
+    router.push("/seller/dashboard")
+  } else {
+    router.push("/seller/onboard")
+  }
+
 }
 
 if (response.data.role === "BUYER") {

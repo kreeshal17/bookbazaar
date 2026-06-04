@@ -13,21 +13,165 @@ datasource db {
 }
 
   
-  enum Role{
-    ADMIN
-    BUYER
-    SELLER
-  }
-
-model users {
-  id             Int @id  @default(autoincrement())         
-  email          String @unique
-  full_name       String
-  password_hash   String
-  avatar_url     String?
-  role            Role @default(BUYER)
-  created_at     DateTime @default(now())
-
-  updated_at      DateTime @updatedAt 
+  enum Role {
+  BUYER
+  SELLER
+  ADMIN
 }
 
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+// ─────────────────────────────────────────
+// USER
+// ─────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+   full_name      String
+  password_hash String
+  avatarUrl    String?
+  role         Role     @default(BUYER)
+ created_at     DateTime @default(now())
+
+  updated_at      DateTime @updatedAt 
+
+  store     Store?
+  orders    Order[]
+  cartItems CartItem[]
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────
+// STORE
+// ─────────────────────────────────────────
+model Store {
+  id          String   @id @default(uuid())
+  sellerId    String   @unique
+  name        String
+  slug        String   @unique
+  description String?
+  logoUrl     String?
+  bannerUrl   String?
+  isVerified  Boolean  @default(false)
+  isActive    Boolean  @default(true)   
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  seller     User        @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  books      Book[]
+  orderItems OrderItem[]
+
+  @@map("stores")
+}
+
+// ─────────────────────────────────────────
+// CATEGORY
+// ─────────────────────────────────────────
+
+model Category {
+  id    String @id @default(uuid())
+  name  String @unique
+  slug  String @unique
+
+  books Book[]
+
+  @@map("categories")
+}
+
+// ─────────────────────────────────────────
+// BOOK
+// ─────────────────────────────────────────
+
+model Book {
+  id          String   @id @default(uuid())
+  storeId     String
+  categoryId  String?
+  title       String
+  description String?
+  author      String?
+  isbn        String?  @unique
+  price       Decimal  @db.Decimal(10, 2)
+  stockQty    Int      @default(0)
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  store      Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+
+  @@index([storeId])
+  @@index([categoryId])
+  @@map("books")
+}
+
+// ─────────────────────────────────────────
+// ORDER
+// ─────────────────────────────────────────
+
+model Order {
+  id           String      @id @default(uuid())
+  buyerId      String
+  status       OrderStatus @default(PENDING)
+  totalAmount  Decimal     @db.Decimal(10, 2)
+  shippingAddr String
+  notes        String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  buyer User        @relation(fields: [buyerId], references: [id], onDelete: Restrict)
+  items OrderItem[]
+
+  @@index([buyerId])
+  @@map("orders")
+}
+
+// ─────────────────────────────────────────
+// ORDER ITEM
+// ─────────────────────────────────────────
+
+model OrderItem {
+  id         String  @id @default(uuid())
+  orderId    String
+  bookId     String
+  storeId    String
+  quantity   Int
+  unitPrice  Decimal @db.Decimal(10, 2)
+  totalPrice Decimal @db.Decimal(10, 2)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  book  Book  @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  store Store @relation(fields: [storeId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([storeId])
+  @@map("order_items")
+}
+
+// ─────────────────────────────────────────
+// CART ITEM
+// ─────────────────────────────────────────
+
+model CartItem {
+  id       String   @id @default(uuid())
+  userId   String
+  bookId   String
+  quantity Int      @default(1)
+  addedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@map("cart_items")
+}
