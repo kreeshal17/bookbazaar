@@ -14,7 +14,7 @@ export default function Sidebar() {
     },
     {
       name: 'My Books', 
-      href: '/seller/dashboard/books',
+      href: '/seller/dashboard/mybook',
       icon: '📚',
     },
     {
