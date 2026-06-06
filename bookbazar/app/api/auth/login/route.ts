@@ -24,7 +24,7 @@ export async function POST(req:Request){
     if(!result.success)
     {
         return Response.json({
-              message: result.error
+              message: result.error.message
 
 
         },{
@@ -64,10 +64,13 @@ export async function POST(req:Request){
 
 
 const password=result.data.password
-     
+     console.log("EMAIL:", result.data.email)
+console.log("USER:", user)
+console.log("PASSWORD FROM FORM:", password)
+console.log("HASH FROM DB:", user.password_hash)
 
      const validation=await  bcrypt.compare(password,user.password_hash)
-
+console.log("VALIDATION:", validation)
 if(!validation)
 {
     return Response.json({
@@ -86,6 +89,7 @@ const session = {
 const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
  
 const token= await encrypt(session)
+
 cookieStore.set('session', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -105,7 +109,6 @@ return Response.json({
 }
 
     
-
 
 
 

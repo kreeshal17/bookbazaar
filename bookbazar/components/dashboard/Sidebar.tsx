@@ -1,10 +1,21 @@
 'use client'
 
+import axios from 'axios'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import  {useRouter} from 'next/navigation'
 
 export default function Sidebar() {
   const pathname = usePathname()
+const router=useRouter()
+ async function handlelogout(){
+
+  await axios.post("/api/auth/logout")
+
+ router.push("/login")
+ router.refresh()
+
+ }
 
   const menuItems = [
     {
@@ -69,7 +80,7 @@ export default function Sidebar() {
 
       {/* Bottom Section */}
       <div className="border-t border-slate-700 p-4">
-        <button className="w-full rounded-lg bg-red-500 px-4 py-3 font-medium hover:bg-red-600 transition">
+        <button onClick={handlelogout}className="w-full rounded-lg bg-red-500 px-4 py-3 font-medium hover:bg-red-600 transition">
           Logout
         </button>
       </div>

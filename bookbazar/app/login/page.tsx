@@ -35,7 +35,7 @@ if (response.data.role === "SELLER") {
 }
 
 if (response.data.role === "BUYER") {
-  router.push("/buyer")
+  router.push("/")
 }
 }
 

@@ -15,7 +15,4 @@ orderBy:{
 })
 
 return Response.json(data)
-
-
-
 }
