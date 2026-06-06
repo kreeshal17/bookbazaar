@@ -80,34 +80,24 @@ export default function Signup() {
     }
   }
 
-  return (
-    <div className="relative min-h-screen bg-[#030712] flex items-center justify-center overflow-hidden px-4">
+ return (
+  <div className="min-h-screen flex bg-slate-50">
 
-      {/* Background */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 h-96 w-96 rounded-full bg-fuchsia-600/30 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-cyan-500/30 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/20 blur-3xl" />
-      </div>
+    {/* LEFT FORM */}
+    <div className="w-full lg:w-[100%] flex items-center justify-center px-8 py-10">
+      <div className="w-full max-w-md">
 
-      {/* Card */}
-      <div className="relative w-full max-w-md">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-slate-900">
+            Create Account
+          </h1>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-2xl p-8 shadow-2xl">
+          <p className="mt-2 text-slate-500">
+            Join BookMandu and start your reading journey.
+          </p>
+        </div>
 
-          <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r from-fuchsia-500 via-indigo-500 to-cyan-500 text-white text-2xl font-bold">
-              B
-            </div>
-
-            <h1 className="text-3xl font-bold text-white">
-              Create Account
-            </h1>
-
-            <p className="mt-2 text-sm text-gray-400">
-              Join Book Bazaar today
-            </p>
-          </div>
+        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
 
           <form onSubmit={handleForm} className="space-y-4">
 
@@ -116,7 +106,7 @@ export default function Signup() {
               placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none transition focus:border-fuchsia-500"
+              className="w-full rounded-xl border border-slate-300 p-3 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
             />
 
             <input
@@ -124,25 +114,17 @@ export default function Signup() {
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none transition focus:border-fuchsia-500"
+              className="w-full rounded-xl border border-slate-300 p-3 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
             />
 
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none focus:border-fuchsia-500"
+              className="w-full rounded-xl border border-slate-300 p-3 text-slate-900 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
             >
-              <option value="" className="text-black">
-                Select Role
-              </option>
-
-              <option value="BUYER" className="text-black">
-                Buyer
-              </option>
-
-              <option value="SELLER" className="text-black">
-                Seller
-              </option>
+              <option value="">Select Role</option>
+              <option value="BUYER">Buyer</option>
+              <option value="SELLER">Seller</option>
             </select>
 
             <input
@@ -150,7 +132,7 @@ export default function Signup() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none transition focus:border-cyan-500"
+              className="w-full rounded-xl border border-slate-300 p-3 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
             />
 
             <input
@@ -158,15 +140,15 @@ export default function Signup() {
               placeholder="Confirm Password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white outline-none transition focus:border-cyan-500"
+              className="w-full rounded-xl border border-slate-300 p-3 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
             />
 
             {message && (
               <div
                 className={`rounded-xl p-3 text-sm ${
                   isError
-                    ? 'bg-red-500/15 text-red-300 border border-red-500/20'
-                    : 'bg-green-500/15 text-green-300 border border-green-500/20'
+                    ? "border border-red-200 bg-red-50 text-red-600"
+                    : "border border-green-200 bg-green-50 text-green-600"
                 }`}
               >
                 {message}
@@ -175,33 +157,34 @@ export default function Signup() {
 
             <button
               disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-r from-fuchsia-500 via-indigo-500 to-cyan-500 py-3 font-semibold text-white transition hover:scale-[1.02] disabled:opacity-50"
+              className="w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-50"
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
+
           </form>
 
           <div className="my-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-white/10" />
-            <span className="text-xs text-gray-500">OR</span>
-            <div className="h-px flex-1 bg-white/10" />
+            <div className="h-px flex-1 bg-slate-200" />
+            <span className="text-xs text-slate-400">OR</span>
+            <div className="h-px flex-1 bg-slate-200" />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <button className="rounded-xl border border-white/10 bg-white/5 py-3 text-white hover:bg-white/10">
+            <button className="rounded-xl border border-slate-300 py-3 font-medium text-slate-700 transition hover:bg-slate-100 hover:border-slate-400">
               Google
             </button>
 
-            <button className="rounded-xl border border-white/10 bg-white/5 py-3 text-white hover:bg-white/10">
+            <button className="rounded-xl border border-slate-300 py-3 font-medium text-slate-700 transition hover:bg-slate-100 hover:border-slate-400">
               GitHub
             </button>
           </div>
 
-          <p className="mt-6 text-center text-sm text-gray-400">
-            Already have an account?{' '}
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Already have an account?{" "}
             <Link
               href="/login"
-              className="font-semibold text-fuchsia-400 hover:text-fuchsia-300"
+              className="font-semibold text-indigo-600"
             >
               Login
             </Link>
@@ -210,5 +193,84 @@ export default function Signup() {
         </div>
       </div>
     </div>
-  )
+
+    {/* RIGHT BOOKMANDU */}
+    
+<div className="hidden lg:flex lg:w-[58%] relative overflow-hidden bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900">
+
+      <div className="absolute top-20 left-20 h-72 w-72 rounded-full bg-indigo-400/20 blur-3xl" />
+      <div className="absolute bottom-20 right-20 h-72 w-72 rounded-full bg-purple-400/20 blur-3xl" />
+
+      <div className="relative z-10 flex flex-col justify-center px-20 text-white">
+
+        <h1 className="text-5xl font-black">
+          📚 BookMandu
+        </h1>
+
+        <p className="mt-3 max-w-xl text-lg text-slate-200">
+          Buy, sell and discover books from trusted sellers across Nepal.
+        </p>
+
+        <div className="mt-8 space-y-3">
+          
+          {/* Sleek & Compact Voucher Banner */}
+          <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 px-4 py-3 shadow-lg border border-pink-400/20">
+            {/* Left & Right Voucher Punch-Holes matching background */}
+            <div className="absolute -left-2 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-[#3c3682]" />
+            <div className="absolute -right-2 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-[#1b1c41]" />
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl animate-bounce">🎁</span>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <h3 className="text-base font-black tracking-tight text-white">
+                      First Order Bonus!
+                    </h3>
+                    <span className="bg-white/20 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md backdrop-blur-sm">
+                      Valid Today
+                    </span>
+                  </div>
+                  <p className="text-xs text-rose-100 font-medium mt-0.5">
+                    Get <span className="font-bold text-yellow-300">15% OFF</span> + Free Delivery across Nepal.
+                  </p>
+                </div>
+              </div>
+
+              {/* Compact Interactive Action */}
+              <div className="flex flex-col items-end justify-center pl-4 border-l border-dashed border-white/30">
+                <span className="text-[10px] uppercase font-bold tracking-widest text-rose-200">Code</span>
+                <span className="bg-white text-rose-600 font-mono font-black px-2 py-0.5 rounded text-xs mt-0.5 shadow-sm select-all cursor-pointer hover:scale-105 transition-transform">
+                  FIRST15
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
+            <h3 className="text-lg font-semibold">
+              📘 Programming Books
+            </h3>
+
+            <p className="mt-1 text-sm text-slate-300">
+              Web Development, DSA and Software Engineering.
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
+            <h3 className="text-lg font-semibold">
+              🤖 AI & ML Resources
+            </h3>
+
+            <p className="mt-1 text-sm text-slate-300">
+              Learn Artificial Intelligence and Machine Learning.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+)
 }

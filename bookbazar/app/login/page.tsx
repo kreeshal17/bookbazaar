@@ -39,118 +39,159 @@ if (response.data.role === "BUYER") {
 }
 }
 
-  return (
-   <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0b0b1a]">
-  {/* Animated gradient blobs */}
-  <div className="absolute -top-32 -left-32 w-96 h-96 bg-white-500 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-pulse" />
-  <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-white-400 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-pulse [animation-delay:2s]" />
-  <div className="absolute top-1/3 left-1/2 w-72 h-72 bg-white-500 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-pulse [animation-delay:4s]" />
+ return (
+  <div className="min-h-screen flex bg-slate-50">
 
-  {/* Grid overlay */}
-  <div
-    className="absolute inset-0 opacity-[0.07]"
-    style={{
-      backgroundImage:
-        "linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)",
-      backgroundSize: "40px 40px",
-    }}
-  />
+    {/* LEFT LOGIN */}
+    <div className="w-full lg:w-[71%] flex items-center justify-center px-8">
+      <div className="w-full max-w-md">
 
-  {/* Glass card */}
-  <div className="relative w-[400px] max-w-[92vw] p-[1px] rounded-2xl bg-gradient-to-br from-white/40 via-white/10 to-white/5 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.6)]">
-    <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 px-8 py-10">
-      {/* Logo orb */}
-      <div className="mx-auto mb-6 w-14 h-14 rounded-2xl bg-gradient-to-br from-fuchsia-500 via-indigo-500 to-cyan-400 grid place-items-center shadow-lg shadow-indigo-500/40">
-        <span className="text-white font-black text-xl">◆</span>
-      </div>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-slate-900">
+            Welcome Back
+          </h1>
 
-      <h1 className="text-center text-2xl font-semibold text-white tracking-tight">
-        Welcome back
-      </h1>
-      <p className="text-center text-sm text-white/50 mt-1 mb-8">
-        Login in to continue to your dashboard
-      </p>
-
-      <form onSubmit={handleForm} className="space-y-5">
-        {/* Email — floating label */}
-        <div className="relative">
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder=" "
-            className="peer w-full bg-white/5 border border-white/10 rounded-xl px-4 pt-5 pb-2 text-white placeholder-transparent focus:outline-none focus:border-fuchsia-400/60 focus:bg-white/10 transition"
-          />
-          <label
-            htmlFor="email"
-            className="absolute left-4 top-2 text-xs text-white/60 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-xs peer-focus:text-fuchsia-300"
-          >
-            Email address
-          </label>
+          <p className="mt-2 text-slate-500">
+            Login to continue your BookMandu journey.
+          </p>
         </div>
 
-        {/* Password */}
-        <div className="relative">
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder=" "
-            className="peer w-full bg-white/5 border border-white/10 rounded-xl px-4 pt-5 pb-2 text-white placeholder-transparent focus:outline-none focus:border-cyan-400/60 focus:bg-white/10 transition"
-          />
-          <label
-            htmlFor="password"
-            className="absolute left-4 top-2 text-xs text-white/60 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-xs peer-focus:text-cyan-300"
-          >
-            Password
-          </label>
+        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
+
+          <form onSubmit={handleForm} className="space-y-5">
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700">
+                Email Address
+              </label>
+
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-600 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-700">
+                Password
+              </label>
+
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-600 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center gap-2 text-slate-600">
+                <input type="checkbox" />
+                Remember me
+              </label>
+
+              <a
+                href="#"
+                className="text-indigo-600 hover:text-indigo-700"
+              >
+                Forgot Password?
+              </a>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white transition hover:bg-indigo-700"
+            >
+              Login
+            </button>
+
+          </form>
+
+          <div className="my-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-slate-200" />
+            <span className="text-xs uppercase text-slate-400">
+              or
+            </span>
+            <div className="h-px flex-1 bg-slate-200" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button className="rounded-xl border border-slate-300 py-3 font-medium text-slate-700 transition hover:bg-slate-100 hover:border-slate-400">
+              Google
+            </button>
+
+            <button className="rounded-xl border border-slate-300 py-3 font-medium text-slate-700 transition hover:bg-slate-100 hover:border-slate-400">
+              GitHub
+            </button>
+          </div>
+
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Don't have an account?{" "}
+            <Link
+              href="/signup"
+              className="font-semibold text-indigo-600 hover:text-indigo-700"
+            >
+              Sign Up
+            </Link>
+          </p>
+
         </div>
-
-        <div className="flex items-center justify-between text-xs text-white/60">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" className="accent-fuchsia-500" />
-            Remember me
-          </label>
-          <a href="#" className="hover:text-white transition">Forgot password?</a>
-        </div>
-
-        <button
-          type="submit"
-          className="group relative w-full overflow-hidden rounded-xl p-[1px] bg-gradient-to-r from-fuchsia-500 via-indigo-500 to-cyan-400"
-        >
-          <span className="block rounded-[10px] bg-[#0b0b1a]/40 group-hover:bg-transparent transition py-3 text-white font-medium tracking-wide">
-            Login 
-          </span>
-        </button>
-      </form>
-
-      <div className="flex items-center gap-3 my-6">
-        <div className="h-px flex-1 bg-white/10" />
-        <span className="text-[11px] uppercase tracking-widest text-white/40">or</span>
-        <div className="h-px flex-1 bg-white/10" />
       </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <button className="py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition">
-          Google
-        </button>
-        <button className="py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition">
-          GitHub
-        </button>
-      </div>
-
-      <p className="text-center text-xs text-white/50 mt-6">
-        Don't have an account?{" "}
-        <button>
-            
-        <Link href="/signup" className="text-white font-medium hover:text-fuchsia-300">Sign up</Link>
-        </button>
-      </p>
     </div>
-  </div>
-</div>
 
-  )
+    {/* RIGHT BRANDING */}
+    <div className="hidden lg:flex lg:w-[58%] relative overflow-hidden bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900">
+
+      <div className="absolute top-10 left-10 h-72 w-72 rounded-full bg-indigo-400/20 blur-3xl" />
+      <div className="absolute bottom-10 right-10 h-72 w-72 rounded-full bg-purple-400/20 blur-3xl" />
+
+      <div className="relative z-10 flex flex-col justify-center px-20 text-white">
+
+        <div>
+          <h1 className="text-5xl font-black">
+            📚 BookMandu
+          </h1>
+
+          <p className="mt-3 max-w-xl text-lg text-slate-200">
+            Discover books from trusted sellers and build your knowledge one page at a time.
+          </p>
+        </div>
+
+        <div className="mt-8 space-y-3">
+
+          <div className="rounded-2xl bg-white/10 p-4 backdrop-blur-md">
+            <div className="text-3xl">📘</div>
+
+            <h3 className="mt-2 text-lg font-bold">
+              Programming
+            </h3>
+
+            <p className="mt-1 text-sm text-slate-300">
+              Web Development, DSA and Software Engineering
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-white/10 p-4 backdrop-blur-md">
+            <div className="text-3xl">🤖</div>
+
+            <h3 className="mt-2 text-lg font-bold">
+              AI & ML
+            </h3>
+
+            <p className="mt-1 text-sm text-slate-300">
+              Artificial Intelligence and Machine Learning
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+)
 }
