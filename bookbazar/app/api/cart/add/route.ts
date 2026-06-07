@@ -35,14 +35,14 @@ const payload=await decrypt(session)
 }
 
     const {id}=payload
-    const {bookId}= await req.json()
+    const {bookID}= await req.json()
 
 const existing= await prisma.cartItem.findUnique({
 
     where:{
         userId_bookId:{
             userId:id as string,
-            bookId
+            bookId:bookID
         }
 
 
@@ -75,7 +75,7 @@ const updatecartitems=await prisma.cartItem.update({
 data:{
 
    userId:id as string,
-   bookId,
+   bookId:bookID,
    quantity:1,
 
 }

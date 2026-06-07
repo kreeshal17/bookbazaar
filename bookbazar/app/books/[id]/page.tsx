@@ -140,7 +140,7 @@ console.log(book);
               </div>
 
               {/* Actions */}
-            <Addtocart bookID={(book.id).toString()}/>
+            <Addtocart bookID={book.id}/>
 
               {/* Seller Info */}
               <div className="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">

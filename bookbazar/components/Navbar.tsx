@@ -22,7 +22,7 @@ useEffect(()=>{
 
 async function getUser(){
 
-const res=await axios.post("/api/auth/me")
+const res=await axios.get("/api/auth/me")
 setUser(res.data)
 
 }

@@ -2,7 +2,7 @@
 
 import axios from "axios"
 import { useRouter } from "next/navigation";
-export default function Addtocart({bookID}:{bookID:Promise<{bookID:string}>})
+export default function Addtocart({bookID}:{bookID:string})
 {
 
     const router=useRouter()
