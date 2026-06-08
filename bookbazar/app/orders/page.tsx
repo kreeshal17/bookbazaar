@@ -1,239 +1,187 @@
 'use client'
-import { useEffect, useState } from "react";
-import axios from "axios";
 
+import axios from "axios"
+import { useEffect, useState } from "react"
 
-interface book{
-id:string
-quantity:number
-book:{
-title:string
-description:string
-author:string
-price:number
-}
-}
-export default function checkout(){
-const [fullName, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [postalCode, setPostalCode] = useState('');
-  const[books,setBooks]= useState<book[]>([])
+interface Order {
+  id: string
+  status: string
+  totalAmount: string
+  shippingAddr: string
+  city: string
+  state: string
+  postalCode: string
+  createdAt: string
 
-const handleSubmit=async (e:any)=>{
-e.preventDefault()
- const response= await axios.post("/api/order/create",{
-    fullName,
-    phone,
-    shippingAddr:address,
-    city,
-    state,
-    postalCode
-    
+  items: {
+    id: string
+    quantity: number
+    unitPrice: string
+    totalPrice: string
 
-
-
- })
- if(response.data)
- {
-    alert("sucessfully submitted")
- }
-
-}
-
-
-
-useEffect(()=>{
-
-const  fetch=async()=>{
-
-
-
-    const response= await axios.get("api/cart/get")
-
-    if(response.data)
-    {
-        setBooks(response.data)
+    book: {
+      title: string
+      author: string
     }
 
-
-
-
-
+    store: {
+      name: string
+    }
+  }[]
 }
-fetch()
 
-},[])
+export default function OrdersPage() {
+  const [orders, setOrders] = useState<Order[]>([])
 
+  useEffect(() => {
+    async function getOrders() {
+      const result = await axios.get("/api/order/get")
 
-const total= books.reduce( (sum,items)=>
-    sum+items.quantity*items.book.price
-,0
+      if (result.data) {
+        setOrders(result.data)
+      }
+    }
 
+    getOrders()
+  }, [])
 
+  return (
+    <main className="min-h-screen bg-slate-50 py-12">
+      <div className="mx-auto max-w-7xl px-6">
 
-)
+        {/* Header */}
+        <div className="mb-10">
+          <h1 className="text-5xl font-bold text-slate-900">
+            My Orders
+          </h1>
 
+          <p className="mt-2 text-slate-600">
+            Track your purchases and order history.
+          </p>
+        </div>
 
+        {orders.length === 0 ? (
+          <div className="rounded-3xl bg-white p-12 text-center shadow-lg">
+            <h2 className="text-2xl font-bold text-slate-800">
+              No Orders Found
+            </h2>
 
-return (
-  <div className="min-h-screen bg-slate-50 py-12">
-    <div className="mx-auto max-w-7xl px-6 flex gap-10 items-start">
-
-      {/* Shipping Form */}
-      <div className="w-1/2 rounded-3xl bg-white p-8 shadow-lg border border-slate-100">
-
-        <h2 className="mb-8 text-3xl font-bold text-slate-900">
-          Shipping Information
-        </h2>
-
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-5  text-black"
-        >
-
-          <div className=" text-black">
-            <label className="mb-2 block font-medium text-slate-700">
-              Full Name
-            </label>
-
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
-            />
+            <p className="mt-3 text-slate-500">
+              You haven't placed any orders yet.
+            </p>
           </div>
+        ) : (
+          <div className="space-y-8">
 
-          <div>
-            <label className="mb-2 block font-medium text-slate-700">
-              Phone Number
-            </label>
+            {orders.map((order) => (
 
-            <input
-              type="text"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
-            />
-          </div>
+              <div
+                key={order.id}
+                className="rounded-3xl bg-white p-8 shadow-lg border border-slate-100"
+              >
 
-          <div>
-            <label className="mb-2 block font-medium text-slate-700">
-              Address
-            </label>
+                {/* Order Header */}
+                <div className="flex items-center justify-between">
 
-            <input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
-            />
-          </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-slate-900">
+                      Order #{order.id.slice(0, 8)}
+                    </h2>
 
-          <div className="flex gap-4">
+                    <p className="mt-1 text-slate-500">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
 
-            <div className="flex-1">
-              <label className="mb-2 block font-medium text-slate-700">
-                City
-              </label>
+                  <span className="rounded-full bg-yellow-100 px-4 py-2 text-sm font-semibold text-yellow-700">
+                    {order.status}
+                  </span>
 
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
-              />
-            </div>
-
-            <div className="flex-1">
-              <label className="mb-2 block font-medium text-slate-700">
-                State
-              </label>
-
-              <input
-                type="text"
-                value={state}
-                onChange={(e) => setState(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
-              />
-            </div>
-
-          </div>
-
-          <div>
-            <label className="mb-2 block font-medium text-slate-700">
-              Postal Code
-            </label>
-
-            <input
-              type="text"
-              value={postalCode}
-              onChange={(e) => setPostalCode(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="mt-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-4 font-bold text-white shadow-lg transition hover:scale-[1.02]"
-          >
-            Place Order
-          </button>
-
-        </form>
-      </div>
-
-      {/* Order Summary */}
-      <div className="w-1/2">
-
-        <h1 className="mb-8 text-3xl font-bold text-slate-900">
-          Order Summary
-        </h1>
-
-        <div className="space-y-6">
-
-          {books.map((c) => (
-
-            <div
-              key={c.id}
-              className="rounded-3xl bg-white p-6 shadow-lg border border-slate-100 hover:shadow-xl transition"
-            >
-
-              <div className="flex gap-6">
-
-                <div className="flex h-40 w-28 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-5xl text-white">
-                  📚
                 </div>
 
-                <div className="flex flex-1 flex-col">
+                {/* Items */}
+                <div className="mt-8 space-y-4">
 
-                  <h2 className="text-2xl font-bold text-slate-900">
-                    {c.book.title}
-                  </h2>
+                  {order.items.map((item) => (
 
-                  <p className="mt-2 text-slate-500">
-                    ✍️ {c.book.author}
+                    <div
+                      key={item.id}
+                      className="rounded-2xl bg-slate-50 p-5 border border-slate-100"
+                    >
+
+                      <div className="flex gap-4">
+
+                        <div className="flex h-20 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-2xl text-white">
+                          📚
+                        </div>
+
+                        <div className="flex-1">
+
+                          <h3 className="text-xl font-bold text-slate-900">
+                            {item.book.title}
+                          </h3>
+
+                          <p className="mt-1 text-slate-500">
+                            ✍️ {item.book.author}
+                          </p>
+
+                          <p className="mt-2 font-medium text-indigo-600">
+                            Store: {item.store.name}
+                          </p>
+
+                          <div className="mt-4 flex flex-wrap gap-4">
+
+                            <span className="rounded-full bg-indigo-50 px-3 py-1 text-sm font-semibold text-indigo-600">
+                              Qty: {item.quantity}
+                            </span>
+
+                            <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">
+                              ₹ {Number(item.unitPrice)}
+                            </span>
+
+                            <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
+                              ₹ {Number(item.totalPrice)}
+                            </span>
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  ))}
+
+                </div>
+
+                {/* Summary */}
+                <div className="mt-8 border-t border-slate-200 pt-6">
+
+                  <h4 className="text-lg font-bold text-slate-900">
+                    Shipping Address
+                  </h4>
+
+                  <p className="mt-2 text-slate-600">
+                    {order.shippingAddr}
                   </p>
 
-                  <p className="mt-4 text-sm text-slate-600">
-                    {c.book.description}
+                  <p className="text-slate-600">
+                    {order.city}, {order.state}
                   </p>
 
-                  <div className="mt-6 flex flex-wrap items-center gap-4">
+                  <p className="text-slate-600">
+                    {order.postalCode}
+                  </p>
 
-                    <span className="rounded-full bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-600">
-                      Qty: {c.quantity}
+                  <div className="mt-6 flex items-center justify-between rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 p-5">
+
+                    <span className="text-xl font-semibold text-slate-700">
+                      Grand Total
                     </span>
 
-                    <span className="text-lg font-bold text-slate-900">
-                      ₹ {c.book.price}
-                    </span>
-
-                    <span className="text-lg font-bold text-green-600">
-                      Total: ₹ {c.quantity * c.book.price}
+                    <span className="text-3xl font-bold text-indigo-600">
+                      ₹ {Number(order.totalAmount)}
                     </span>
 
                   </div>
@@ -242,41 +190,12 @@ return (
 
               </div>
 
-            </div>
-
-          ))}
-
-        </div>
-
-        <div className="mt-8 rounded-3xl bg-gradient-to-r from-indigo-50 to-purple-50 p-6 border border-indigo-100">
-
-          <div className="flex items-center justify-between">
-
-            <span className="text-xl font-semibold text-slate-700">
-              Grand Total
-            </span>
-
-            <span className="text-4xl font-bold text-indigo-600">
-              ₹ {total}
-            </span>
+            ))}
 
           </div>
-
-        </div>
+        )}
 
       </div>
-
-    </div>
-  </div>
-)
-
-
-
-
-
-
-
-
-
-
+    </main>
+  )
 }

@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { encrypt } from "@/app/lib/session";
+
 import { decrypt } from "@/app/lib/session";
 import { cookies } from "next/headers";
 import { z } from "zod";
@@ -114,11 +114,47 @@ const result=await prisma.order.create({
 
     }
 })
-await prisma.cartItem.deleteMany({
-  where:{
-    userId:id as string
+
+
+
+
+
+
+
+
+
+
+
+  await prisma.orderItem.createMany({
+
+
+data:cartitems.map( (item)=>({
+
+   orderId:result.id,
+   bookId:item.bookId,
+   storeId:item.book.storeId,
+   quantity:item.quantity,
+   unitPrice:item.book.price,
+   totalPrice:Number(item.book.price)*item.quantity
+
+
+
+
+}
+))
+})
+const check = await prisma.orderItem.findMany({
+  where: {
+    orderId: result.id
   }
 })
+
+console.log("ORDER ITEMS:", check)
+    
+  await  prisma.cartItem.deleteMany({
+where:{
+  userId:id as string
+}})
 
 return Response.json(
   {

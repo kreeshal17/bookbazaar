@@ -25,7 +25,7 @@ router.push("/")
 }
 const handleProceed=()=>{
 
-router.push("/orders")
+router.push("/checkout")
 }
 
 
