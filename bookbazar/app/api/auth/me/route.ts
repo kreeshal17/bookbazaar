@@ -1,7 +1,7 @@
 import { decrypt } from "@/app/lib/session";
 import { cookies } from "next/headers";
 
-export  async function POST(res:Request)
+export  async function GET(res:Request)
 {
 
     const cookieStore= await cookies()

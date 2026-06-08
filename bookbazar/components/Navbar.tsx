@@ -54,7 +54,7 @@ getUser();
           </Link>
 
           <Link
-            href="/signup"
+            href="/books"
             className="font-medium text-slate-600 hover:text-indigo-600"
           >
             Books

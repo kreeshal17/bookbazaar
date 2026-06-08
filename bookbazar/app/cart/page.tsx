@@ -23,6 +23,10 @@ router.push("/")
 
 
 }
+const handleProceed=()=>{
+
+router.push("/orders")
+}
 
 
 
@@ -129,7 +133,7 @@ return (
 
           <div className="mb-6 h-px bg-slate-200"></div>
 
-          <button className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-4 font-semibold text-white transition hover:scale-[1.02]">
+          <button onClick={handleProceed} className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-4 font-semibold text-white transition hover:scale-[1.02]">
             Proceed to Checkout
           </button>
 
