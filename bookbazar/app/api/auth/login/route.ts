@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import prisma from '@/lib/prisma'
 import { cookies } from 'next/headers'
 import { encrypt } from '@/app/lib/session'
+import redis from '@/lib/redis/redis'
 
 const loginSchema=z.object({
     
@@ -35,6 +36,21 @@ export async function POST(req:Request){
 
     }
 
+    const attempts= await redis.get(`login:${result.data.email}`)
+
+    if(Number(attempts)>=5)
+    {
+        return Response.json({
+              message:"Too many login attempts"
+    },
+    {
+      status:429
+    })
+        }
+    
+
+        
+
     const user=await prisma.user.findUnique({
     where:{
         email:result.data.email
@@ -64,15 +80,19 @@ export async function POST(req:Request){
 
 
 const password=result.data.password
-     console.log("EMAIL:", result.data.email)
-console.log("USER:", user)
-console.log("PASSWORD FROM FORM:", password)
-console.log("HASH FROM DB:", user.password_hash)
+   
 
      const validation=await  bcrypt.compare(password,user.password_hash)
 console.log("VALIDATION:", validation)
 if(!validation)
 {
+
+    await redis.incr(`login:${result.data.email}`)
+
+     await redis.expire(
+      `login:${result.data.email}`,
+      900
+    )
     return Response.json({
         message:"password and email doesnot matched"
     },{

@@ -1,5 +1,5 @@
 'use client'
-
+import redis from "@/lib/redis/redis"
 import axios from "axios"
 import { useState } from "react"
 import Link  from "next/link"
@@ -11,7 +11,7 @@ export default function Login() {
   const router= useRouter()
   async function handleForm(e:any) {
     e.preventDefault()
-
+try{
     const response = await axios.post("/api/auth/login", {
       email,
       password,
@@ -36,6 +36,14 @@ if (response.data.role === "SELLER") {
 
 if (response.data.role === "BUYER") {
   router.push("/")
+}
+}
+catch(error:any)
+{
+  if(error.response.status==429)
+  {
+    alert("too many attempt retry after sometime")
+  }
 }
 }
 
