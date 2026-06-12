@@ -62,6 +62,13 @@ if (!result.success) {
 }
 
 const data=result.data
+const category = data.categoryId
+  ? await prisma.category.findFirst({
+      where: {
+        OR: [{ id: data.categoryId }, { slug: data.categoryId }],
+      },
+    })
+  : null;
 
 const sessionCookie= cookieStore.get("session")?.value
 if (!sessionCookie) {
@@ -101,6 +108,7 @@ const book=await prisma.book.create({
           description:data.description,
           author:data.author,
           isbn:data.isbn,
+          categoryId:data.categoryId ? category?.id : null,
           price:data.price,
           stockQty:data.stockQty,
 
