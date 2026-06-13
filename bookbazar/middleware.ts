@@ -1,6 +1,6 @@
 
 import {NextRequest,NextResponse} from "next/server"
-import { decrypt } from "./lib/middleware-session"
+import { decrypt } from "./app/lib/middleware-session"
 export async function middleware(req:NextRequest)
 {
 
