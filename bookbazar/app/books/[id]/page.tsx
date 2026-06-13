@@ -3,18 +3,15 @@ import prisma from "@/lib/prisma"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/home/footer"
 import axios from "axios"
+import { useQRCode } from 'next-qrcode'
 
 
 import Addtocart from "@/components/books/addtocart"
-
+import BookQRCode from "@/components/books/BookQRCode"
 
 export default async function Book({params}:{params:Promise<{id:string}>})
 {
     
-
-
-
-
 
 const {id}= await params
 const book= await prisma.book.findFirst({
@@ -144,7 +141,9 @@ console.log(book);
               </div>
 
               {/* Actions */}
-            <Addtocart bookID={book.id}/>
+              <Addtocart bookID={book.id}/>
+
+              <BookQRCode path={`/books/${book.id}`} />
 
               {/* Seller Info */}
               <div className="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
