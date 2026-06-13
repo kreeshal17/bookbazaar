@@ -34,6 +34,16 @@ const emptyForm: BookForm = {
   description: "",
 };
 
+const categories = [
+  { value: "fiction", label: "Fiction" },
+  { value: "non-fiction", label: "Non-Fiction" },
+  { value: "self-improvement", label: "Self Improvement" },
+  { value: "business", label: "Business" },
+  { value: "technology", label: "Technology" },
+  { value: "academic", label: "Academic" },
+  { value: "others", label: "Others" },
+];
+
 export default function AddBookPage() {
   const [form, setForm] = useState<BookForm>(emptyForm);
   const [editBookId, setEditBookId] = useState<string | null>(null);
@@ -138,8 +148,8 @@ export default function AddBookPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-10">
-      <div className="mx-auto max-w-6xl rounded-3xl border border-slate-200 bg-white p-10 shadow-xl">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
+      <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-white p-5 shadow-xl md:p-10">
         <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600">
@@ -273,10 +283,11 @@ export default function AddBookPage() {
                     className="w-full rounded-xl border border-slate-300 px-4 py-3 text-black outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
                   >
                     <option value="">Select Category</option>
-                    <option value="programming">Programming</option>
-                    <option value="curriculum">Curriculum</option>
-                    <option value="history">History</option>
-                    <option value="others">Others</option>
+                    {categories.map((category) => (
+                      <option key={category.value} value={category.value}>
+                        {category.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 

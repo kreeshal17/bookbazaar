@@ -37,6 +37,27 @@ const payload=await decrypt(session)
     const {id}=payload
     const {bookID}= await req.json()
 
+const book = await prisma.book.findFirst({
+  where: {
+    id: bookID,
+    isActive: true,
+    store: {
+      isActive: true
+    }
+  }
+})
+
+if (!book) {
+  return Response.json(
+    {
+      message: "Book is not available"
+    },
+    {
+      status: 404
+    }
+  )
+}
+
 const existing= await prisma.cartItem.findUnique({
 
     where:{

@@ -93,7 +93,8 @@ const slug=storename.trim().toLowerCase().replace(" ","-")
           sellerId: payload.id as string,
           name: storename,
           slug,
-          description
+          description,
+          isActive: false
         }
       })
 

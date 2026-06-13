@@ -109,7 +109,7 @@ export default function AdminPage() {
           item.id === store.id ? { ...item, isActive: !store.isActive } : item
         )
       );
-      setMessage(store.isActive ? "Seller banned." : "Seller unbanned.");
+      setMessage(store.isActive ? "Seller banned." : "Seller approved.");
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || "Unable to update seller");
@@ -230,7 +230,7 @@ export default function AdminPage() {
                             : "border-red-200 bg-red-50 text-red-700"
                         }`}
                       >
-                        {store.isActive ? "ACTIVE" : "BANNED"}
+                        {store.isActive ? "APPROVED" : "PENDING"}
                       </span>
                     </div>
 
@@ -258,7 +258,7 @@ export default function AdminPage() {
                           : "bg-green-600 text-white hover:bg-green-700"
                       }`}
                     >
-                      {store.isActive ? "Ban Seller" : "Unban Seller"}
+                      {store.isActive ? "Ban Seller" : "Approve Seller"}
                     </button>
 
                     <button

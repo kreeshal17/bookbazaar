@@ -4,6 +4,40 @@ import { error } from "console";
 import { cookies } from "next/headers";
 import {z} from "zod"
 
+const categoryLabels: Record<string, string> = {
+  fiction: "Fiction",
+  "non-fiction": "Non-Fiction",
+  "self-improvement": "Self Improvement",
+  business: "Business",
+  technology: "Technology",
+  academic: "Academic",
+  others: "Others",
+};
+
+async function getCategoryId(categoryId?: string) {
+  if (!categoryId) {
+    return null;
+  }
+
+  const slug = categoryId.trim().toLowerCase();
+  const name = categoryLabels[slug] || categoryId;
+
+  const category = await prisma.category.upsert({
+    where: {
+      slug,
+    },
+    update: {
+      name,
+    },
+    create: {
+      name,
+      slug,
+    },
+  });
+
+  return category.id;
+}
+
 
 
  const addBookSchema = z.object({
@@ -62,13 +96,7 @@ if (!result.success) {
 }
 
 const data=result.data
-const category = data.categoryId
-  ? await prisma.category.findFirst({
-      where: {
-        OR: [{ id: data.categoryId }, { slug: data.categoryId }],
-      },
-    })
-  : null;
+const categoryId = await getCategoryId(data.categoryId);
 
 const sessionCookie= cookieStore.get("session")?.value
 if (!sessionCookie) {
@@ -108,7 +136,7 @@ const book=await prisma.book.create({
           description:data.description,
           author:data.author,
           isbn:data.isbn,
-          categoryId:data.categoryId ? category?.id : null,
+          categoryId,
           price:data.price,
           stockQty:data.stockQty,
 

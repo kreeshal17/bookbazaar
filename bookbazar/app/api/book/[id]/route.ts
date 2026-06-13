@@ -14,6 +14,40 @@ const updateBookSchema = z.object({
   imageUrl: z.string().url("Invalid image URL").optional(),
 });
 
+const categoryLabels: Record<string, string> = {
+  fiction: "Fiction",
+  "non-fiction": "Non-Fiction",
+  "self-improvement": "Self Improvement",
+  business: "Business",
+  technology: "Technology",
+  academic: "Academic",
+  others: "Others",
+};
+
+async function getCategoryId(categoryId?: string) {
+  if (!categoryId) {
+    return null;
+  }
+
+  const slug = categoryId.trim().toLowerCase();
+  const name = categoryLabels[slug] || categoryId;
+
+  const category = await prisma.category.upsert({
+    where: {
+      slug,
+    },
+    update: {
+      name,
+    },
+    create: {
+      name,
+      slug,
+    },
+  });
+
+  return category.id;
+}
+
 async function getSellerStore() {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get("session")?.value;
@@ -57,13 +91,21 @@ export async function GET(
       id,
       storeId: store.id,
     },
+    include: {
+      category: true,
+    },
   });
 
   if (!book) {
     return Response.json({ message: "Book not found" }, { status: 404 });
   }
 
-  return Response.json({ book });
+  return Response.json({
+    book: {
+      ...book,
+      categoryId: book.category?.slug || book.categoryId,
+    },
+  });
 }
 
 export async function PATCH(
@@ -96,13 +138,7 @@ export async function PATCH(
   }
 
   const data = result.data;
-  const category = data.categoryId
-    ? await prisma.category.findFirst({
-        where: {
-          OR: [{ id: data.categoryId }, { slug: data.categoryId }],
-        },
-      })
-    : null;
+  const categoryId = await getCategoryId(data.categoryId);
 
   const book = await prisma.book.update({
     where: {
@@ -113,7 +149,7 @@ export async function PATCH(
       description: data.description,
       author: data.author,
       isbn: data.isbn,
-      categoryId: data.categoryId ? category?.id : null,
+      categoryId,
       price: data.price,
       stockQty: data.stockQty,
     },

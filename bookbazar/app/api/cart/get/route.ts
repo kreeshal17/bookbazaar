@@ -30,7 +30,13 @@ const {id}=payload
 
 const cartitems= await prisma.cartItem.findMany({
 where:{
-    userId:id as string
+    userId:id as string,
+    book:{
+        isActive:true,
+        store:{
+            isActive:true
+        }
+    }
 },
 include:{
 book:true

@@ -57,11 +57,41 @@ export default function Footer() {
             </h3>
 
             <ul className="space-y-3 text-slate-400">
-              <li>Programming</li>
-              <li>Database</li>
-              <li>AI & ML</li>
-              <li>Business</li>
-              <li>Academic</li>
+              <li>
+                <Link href="/books?category=fiction" className="hover:text-white">
+                  Fiction
+                </Link>
+              </li>
+              <li>
+                <Link href="/books?category=non-fiction" className="hover:text-white">
+                  Non-Fiction
+                </Link>
+              </li>
+              <li>
+                <Link href="/books?category=self-improvement" className="hover:text-white">
+                  Self Improvement
+                </Link>
+              </li>
+              <li>
+                <Link href="/books?category=business" className="hover:text-white">
+                  Business
+                </Link>
+              </li>
+              <li>
+                <Link href="/books?category=technology" className="hover:text-white">
+                  Technology
+                </Link>
+              </li>
+              <li>
+                <Link href="/books?category=academic" className="hover:text-white">
+                  Academic
+                </Link>
+              </li>
+              <li>
+                <Link href="/books?category=others" className="hover:text-white">
+                  Others
+                </Link>
+              </li>
             </ul>
           </div>
 

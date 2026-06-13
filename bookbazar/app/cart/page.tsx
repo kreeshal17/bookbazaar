@@ -1,169 +1,262 @@
-'use client'
+"use client";
+
 import axios from "axios";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-interface book{
-id:string
-quantity:number
-book:{
-title:string
-description:String
-author:string
-price:number
+interface CartItem {
+  id: string;
+  quantity: number;
+  book: {
+    title: string;
+    description: string | null;
+    author: string | null;
+    price: number;
+  };
 }
 
-}
-export default function page(){
+export default function CartPage() {
+  const router = useRouter();
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [busyItemId, setBusyItemId] = useState<string | null>(null);
 
+  useEffect(() => {
+    getCart();
+  }, []);
 
+  async function getCart() {
+    setError("");
 
-
-
-  
-
-    const router=useRouter()
-const handleshopping=()=>{
-router.push("/")
-
-
-}
-const handleProceed=()=>{
-
-router.push("/checkout")
-}
-
-
-
-
-const[cartitems,setCartItems]=useState<book[]>([])
-
-
-
-
-const getCart = async () => {
-  const result = await axios.get("/api/cart/get");
-
-  if (result.data) {
-    setCartItems(result.data);
+    try {
+      const result = await axios.get<CartItem[]>("/api/cart/get");
+      setCartItems(result.data);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Unable to load cart");
+      } else {
+        setError("Unable to load cart");
+      }
+    } finally {
+      setLoading(false);
+    }
   }
-};
 
-const decreaseQuantity = async (id: string) => {
-  try {
-    await axios.patch("/api/cart/decrease", {
-      cartItemId: id,
-    });
+  async function updateQuantity(id: string, action: "increment" | "decrement") {
+    setBusyItemId(id);
+    setError("");
 
-    await getCart();
+    try {
+      const response = await axios.patch(`/api/cart/${id}`, { action });
+      const updatedItem = response.data.cartItem as CartItem | null;
 
-  } catch (error) {
-    console.log(error);
+      setCartItems((current) => {
+        if (!updatedItem) {
+          return current.filter((item) => item.id !== id);
+        }
+
+        return current.map((item) => (item.id === id ? updatedItem : item));
+      });
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Unable to update cart");
+      } else {
+        setError("Unable to update cart");
+      }
+    } finally {
+      setBusyItemId(null);
+    }
   }
-};
 
-useEffect(() => {
-  getCart();
-}, []);
+  async function removeItem(id: string) {
+    setBusyItemId(id);
+    setError("");
 
-return (
-  <div className="min-h-screen bg-slate-50 py-12 px-6">
-    <div className="mx-auto max-w-6xl">
+    try {
+      await axios.delete(`/api/cart/${id}`);
+      setCartItems((current) => current.filter((item) => item.id !== id));
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Unable to remove item");
+      } else {
+        setError("Unable to remove item");
+      }
+    } finally {
+      setBusyItemId(null);
+    }
+  }
 
-      <h1 className="mb-8 text-4xl font-bold text-slate-900">
-        🛒 Your Cart
-      </h1>
+  const totals = useMemo(() => {
+    return cartItems.reduce(
+      (acc, item) => {
+        acc.quantity += item.quantity;
+        acc.amount += item.quantity * Number(item.book.price);
+        return acc;
+      },
+      { quantity: 0, amount: 0 }
+    );
+  }, [cartItems]);
 
-      <div className="grid gap-8 lg:grid-cols-3">
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 p-6 md:p-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="h-24 animate-pulse rounded-2xl bg-white shadow-sm" />
+          <div className="mt-6 grid gap-6 lg:grid-cols-3">
+            <div className="h-80 animate-pulse rounded-2xl bg-white shadow-sm lg:col-span-2" />
+            <div className="h-72 animate-pulse rounded-2xl bg-white shadow-sm" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-        {/* Cart Items */}
-        <div className="lg:col-span-2 space-y-6">
+  return (
+    <div className="min-h-screen bg-slate-50 px-4 py-8 md:px-6 md:py-12">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h1 className="text-3xl font-bold text-slate-900 md:text-4xl">
+            Your Cart
+          </h1>
+          <p className="mt-2 text-slate-500">
+            Review your selected books before checkout.
+          </p>
+        </div>
 
-          {cartitems.map((c) => (
+        {error && (
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 font-medium text-red-700">
+            {error}
+          </div>
+        )}
 
-            <div
-              key={c.id}
-              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-lg"
+        {cartItems.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
+            <h2 className="text-2xl font-bold text-slate-900">
+              Your cart is empty
+            </h2>
+            <p className="mt-2 text-slate-500">
+              Add books to your cart and they will show up here.
+            </p>
+            <button
+              onClick={() => router.push("/books")}
+              className="mt-6 rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700"
             >
-              <div className="flex gap-6">
+              Browse Books
+            </button>
+          </div>
+        ) : (
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="space-y-5 lg:col-span-2">
+              {cartItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                >
+                  <div className="flex flex-col gap-5 sm:flex-row">
+                    <div className="flex h-32 w-full items-center justify-center rounded-xl bg-indigo-50 text-5xl sm:w-24">
+                      📚
+                    </div>
 
-                {/* Dummy Book Cover */}
-                <div className="flex h-40 w-28 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-5xl text-white">
-                  📚
-                </div>
+                    <div className="min-w-0 flex-1">
+                      <h2 className="text-xl font-bold text-slate-900">
+                        {item.book.title}
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {item.book.author || "Unknown Author"}
+                      </p>
+                      <p className="mt-3 line-clamp-2 text-sm text-slate-600">
+                        {item.book.description || "No description available."}
+                      </p>
 
-                {/* Details */}
-                <div className="flex flex-1 flex-col">
+                      <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <p className="text-lg font-bold text-indigo-600">
+                            Rs. {Number(item.book.price)}
+                          </p>
+                          <p className="text-sm font-semibold text-green-600">
+                            Total: Rs.{" "}
+                            {(item.quantity * Number(item.book.price)).toLocaleString()}
+                          </p>
+                        </div>
 
-                  <h2 className="text-2xl font-bold text-slate-900">
-                    {c.book.title}
-                  </h2>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => updateQuantity(item.id, "decrement")}
+                            disabled={busyItemId === item.id}
+                            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-lg font-bold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            -
+                          </button>
 
-                  <p className="mt-2 text-slate-500">
-                    ✍️ {c.book.author}
-                  </p>
+                          <span className="min-w-10 rounded-full bg-slate-100 px-4 py-2 text-center font-bold">
+                            {item.quantity}
+                          </span>
 
-                  <p className="mt-4 text-sm text-slate-600 line-clamp-3">
-                    {c.book.description}
-                  </p>
+                          <button
+                            onClick={() => updateQuantity(item.id, "increment")}
+                            disabled={busyItemId === item.id}
+                            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-lg font-bold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            +
+                          </button>
 
-                  <div className="mt-6 flex flex-wrap items-center gap-6">
-
-                    <span className="rounded-full bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-600">
-                      Qty: {c.quantity}
-                    </span>
-
-                    <span className="text-lg font-bold text-slate-900">
-                      ₹ {c.book.price}
-                    </span>
-
-                    <span className="text-lg font-bold text-green-600">
-                      Total: ₹ {c.quantity * c.book.price}
-                    </span>
-<button
-    onClick={() => decreaseQuantity(c.id)}
-    className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 bg-white text-lg font-bold text-slate-700 transition hover:bg-slate-100"
-  >
-    -
-  </button>
+                          <button
+                            onClick={() => removeItem(item.id)}
+                            disabled={busyItemId === item.id}
+                            className="rounded-xl border border-red-200 px-4 py-2 font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-
                 </div>
-              </div>
+              ))}
             </div>
 
-          ))}
+            <div className="h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-2xl font-bold text-slate-900">
+                Order Summary
+              </h2>
 
-        </div>
+              <div className="mt-6 space-y-4">
+                <div className="flex justify-between text-slate-600">
+                  <span>Total Quantity</span>
+                  <span className="font-semibold">{totals.quantity}</span>
+                </div>
 
-        {/* Summary Card */}
-        <div className="h-fit rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+                <div className="flex justify-between text-slate-600">
+                  <span>Total Items</span>
+                  <span className="font-semibold">{cartItems.length}</span>
+                </div>
 
-          <h2 className="mb-6 text-2xl font-bold text-slate-900">
-            Order Summary
-          </h2>
+                <div className="h-px bg-slate-200" />
 
-          <div className="mb-4 flex justify-between text-slate-600">
-            <span>Total Items</span>
-            <span>{cartitems.length}</span>
+                <div className="flex justify-between text-xl font-bold text-slate-900">
+                  <span>Subtotal</span>
+                  <span>Rs. {totals.amount.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => router.push("/checkout")}
+                className="mt-6 w-full rounded-xl bg-indigo-600 py-4 font-semibold text-white transition hover:bg-indigo-700"
+              >
+                Proceed to Checkout
+              </button>
+
+              <button
+                onClick={() => router.push("/books")}
+                className="mt-3 w-full rounded-xl border border-slate-300 py-4 font-semibold text-slate-700 transition hover:bg-slate-100"
+              >
+                Continue Shopping
+              </button>
+            </div>
           </div>
-
-          <div className="mb-6 h-px bg-slate-200"></div>
-
-          <button onClick={handleProceed} className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-4 font-semibold text-white transition hover:scale-[1.02]">
-            Proceed to Checkout
-          </button>
-
-          <button  onClick={handleshopping} className="mt-4 w-full rounded-xl border border-slate-300 py-4 font-semibold text-slate-700 transition hover:bg-slate-100">
-            Continue Shopping
-          </button>
-
-        </div>
-
+        )}
       </div>
     </div>
-  </div>
-)
-
-
+  );
 }

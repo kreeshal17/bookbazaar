@@ -87,7 +87,13 @@ const {fullName,phone,shippingAddr,city,state, postalCode}= schema.data
 
 const cartitems=await prisma.cartItem.findMany({
    where:{
-    userId:id as string
+    userId:id as string,
+    book:{
+      isActive:true,
+      store:{
+        isActive:true
+      }
+    }
    }
   ,include:{
     book:true
@@ -95,6 +101,16 @@ const cartitems=await prisma.cartItem.findMany({
 
 
 })
+if (cartitems.length === 0) {
+  return Response.json(
+    {
+      message: "Cart is empty"
+    },
+    {
+      status: 400
+    }
+  )
+}
 const total= cartitems.reduce(  (sum,items)=> sum+ items.quantity *Number( items.book.price),0 )
 
 const result=await prisma.order.create({

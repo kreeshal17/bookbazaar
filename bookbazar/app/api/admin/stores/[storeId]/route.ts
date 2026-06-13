@@ -153,6 +153,12 @@ export async function DELETE(
       });
     }
 
+    await tx.cartItem.deleteMany({
+      where: {
+        userId: store.sellerId,
+      },
+    });
+
     await tx.user.delete({
       where: {
         id: store.sellerId,
