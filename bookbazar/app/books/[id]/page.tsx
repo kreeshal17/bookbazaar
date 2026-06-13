@@ -17,10 +17,14 @@ export default async function Book({params}:{params:Promise<{id:string}>})
 
 
 const {id}= await params
-const book= await prisma.book.findUnique({
+const book= await prisma.book.findFirst({
 
     where:{
-        id:id
+        id:id,
+        isActive:true,
+        store:{
+          isActive:true
+        }
     }
 })
 

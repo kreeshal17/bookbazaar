@@ -17,6 +17,11 @@ price:number
 export default function page(){
 
 
+
+
+
+  
+
     const router=useRouter()
 const handleshopping=()=>{
 router.push("/")
@@ -34,25 +39,32 @@ router.push("/checkout")
 const[cartitems,setCartItems]=useState<book[]>([])
 
 
-    useEffect(()=>{
-
-async function getCart()
-{
-
-const result=await axios.get("/api/cart/get")
-
-if(result.data)
-{
-    setCartItems(result.data)
-}
-
-}
 
 
-getCart()
+const getCart = async () => {
+  const result = await axios.get("/api/cart/get");
 
-    },[])
+  if (result.data) {
+    setCartItems(result.data);
+  }
+};
 
+const decreaseQuantity = async (id: string) => {
+  try {
+    await axios.patch("/api/cart/decrease", {
+      cartItemId: id,
+    });
+
+    await getCart();
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+useEffect(() => {
+  getCart();
+}, []);
 
 return (
   <div className="min-h-screen bg-slate-50 py-12 px-6">
@@ -108,7 +120,12 @@ return (
                     <span className="text-lg font-bold text-green-600">
                       Total: ₹ {c.quantity * c.book.price}
                     </span>
-
+<button
+    onClick={() => decreaseQuantity(c.id)}
+    className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 bg-white text-lg font-bold text-slate-700 transition hover:bg-slate-100"
+  >
+    -
+  </button>
                   </div>
 
                 </div>

@@ -4,7 +4,10 @@ export async function GET(){
 
 const data= await prisma.book.findMany({
 where:{
-    isActive:true
+    isActive:true,
+    store:{
+        isActive:true
+    }
 
 
 },
