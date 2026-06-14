@@ -70,6 +70,9 @@ export default function Navbar() {
           <Link href="/books" className="rounded-md px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors">
             Books
           </Link>
+          <Link href="/help" className="rounded-md px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors">
+            How we function
+          </Link>
           {/* <Link href="/categories" className="rounded-md px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors">
             Categories
           </Link> */}

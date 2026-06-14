@@ -37,8 +37,8 @@ export default function Footer() {
               </li>
 
               <li>
-                <Link href="/categories" className="hover:text-white">
-                  Categories
+                <Link href="/help" className="hover:text-white">
+                 how we functions
                 </Link>
               </li>
 
