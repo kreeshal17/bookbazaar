@@ -1,4 +1,3 @@
-```markdown
 # BookMandu
 
 BookMandu is a full-stack online book marketplace built with Next.js 16, PostgreSQL, Prisma, Redis, and Cloudinary. It connects buyers, sellers, and administrators through a seamless book-buying and selling experience.
@@ -11,7 +10,8 @@ BookMandu is a full-stack online book marketplace built with Next.js 16, Postgre
 
 ### Buyer
 - Browse active book listings across all stores
-- Search books by title, au
+- Search books by title, author, description, or ISBN
+- Filter books by category
 - View detailed book pages with cover image, description, author, price, and ISBN
 - Add books to cart and manage cart items
 - Checkout with shipping details (name, phone, address, city, state, postal code)
@@ -43,7 +43,7 @@ BookMandu is a full-stack online book marketplace built with Next.js 16, Postgre
 - Answers buyer questions about available books
 - Recommends titles based on user queries
 - Provides pricing and store information
-- Strictly limited to books listed on the platform — no hallucination outside inventory
+- Strictly limited to books listed on the platform
 
 ### Media
 - Book cover image uploads handled server-side via Cloudinary
@@ -73,25 +73,19 @@ BookMandu is a full-stack online book marketplace built with Next.js 16, Postgre
 ```
 bookbazaar/
 ├── app/
-│   ├── api/              # REST API endpoints
-│   │   ├── auth/         # Login, signup, logout
-│   │   ├── book/         # Book CRUD
-│   │   ├── cart/         # Cart management
-│   │   ├── order/        # Order creation and tracking
-│   │   ├── seller/       # Seller order management
-│   │   ├── store/        # Store creation
-│   │   ├── upload/       # Cloudinary image upload
-│   │   └── chat/         # AI chatbot
-│   ├── lib/              # Session and definitions
-│   ├── buyer/            # Buyer pages
-│   ├── seller/           # Seller dashboard pages
-│   ├── admin/            # Admin dashboard pages
-│   └── components/       # Shared UI components
-├── components/           # Global components (Navbar, Footer)
-├── lib/                  # Prisma client, Redis client, utilities
-├── prisma/               # Schema and migrations
-└── public/               # Static assets
+│   ├── api/          # REST endpoints (auth, book, cart, order, upload, chat)
+│   ├── buyer/        # Buyer pages (cart, checkout, orders)
+│   ├── seller/       # Seller dashboard (books, orders)
+│   ├── admin/        # Admin dashboard
+│   ├── books/        # Public book listing and detail pages
+│   └── lib/          # Session and type definitions
+├── components/       # Navbar, Footer, shared UI
+├── lib/              # Prisma client, Redis client, utilities
+├── prisma/           # Schema and migrations
+├── middleware.ts     # Route protection
+└── .env              # Environment variables
 ```
+
 
 ---
 
@@ -103,6 +97,7 @@ bookbazaar/
 - PostgreSQL database (Neon recommended)
 - Redis server (Upstash recommended)
 - Cloudinary account
+- Google Gemini API key
 
 ### Install dependencies
 
@@ -213,5 +208,3 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## License
 
 MIT
-```
-
