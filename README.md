@@ -66,8 +66,6 @@ BookMandu is a full-stack online book marketplace built with Next.js 16, Postgre
 | AI | Google Gemini via Vercel AI SDK |
 | Deployment | Vercel |
 
----
-
 ## Repository Structure
 
 ```
@@ -85,9 +83,6 @@ bookbazaar/
 ├── middleware.ts     # Route protection
 └── .env              # Environment variables
 ```
-
-
----
 
 ## Getting Started
 
