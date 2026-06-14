@@ -30,8 +30,10 @@ async function getSellerStore() {
 }
 
 export async function GET() {
+  console.log('sadf');
   const { store, error } = await getSellerStore();
-
+  console.log('sadf');
+  
   if (error) {
     return error;
   }

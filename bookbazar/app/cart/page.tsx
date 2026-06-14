@@ -3,7 +3,9 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-
+import Navbar from "@/components/Navbar"
+import Footer from "@/components/home/footer"
+import Image from "next/image";
 interface CartItem {
   id: string;
   quantity: number;
@@ -12,6 +14,7 @@ interface CartItem {
     description: string | null;
     author: string | null;
     price: number;
+    imageUrl:string|null
   };
 }
 
@@ -100,6 +103,8 @@ export default function CartPage() {
 
   if (loading) {
     return (
+      <>
+      <Navbar/>
       <div className="min-h-screen bg-slate-50 p-6 md:p-8">
         <div className="mx-auto max-w-6xl">
           <div className="h-24 animate-pulse rounded-2xl bg-white shadow-sm" />
@@ -109,10 +114,14 @@ export default function CartPage() {
           </div>
         </div>
       </div>
+      <Footer/>
+      </>
     );
   }
 
   return (
+    <>
+    <Navbar/>
     <div className="min-h-screen bg-slate-50 px-4 py-8 md:px-6 md:py-12">
       <div className="mx-auto max-w-6xl">
         <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -154,9 +163,26 @@ export default function CartPage() {
                   className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
                 >
                   <div className="flex flex-col gap-5 sm:flex-row">
-                    <div className="flex h-32 w-full items-center justify-center rounded-xl bg-indigo-50 text-5xl sm:w-24">
+                    {/* <div className="flex h-32 w-full items-center justify-center rounded-xl bg-indigo-50 text-5xl sm:w-24">
                       📚
-                    </div>
+                    </div> */}
+
+
+<div className="flex h-32 w-full items-center justify-center rounded-xl bg-indigo-50 sm:w-24 overflow-hidden relative">
+  {item.book.imageUrl ? (
+    <Image
+      src={item.book.imageUrl}
+      alt={item.book.title}
+      fill
+      className="object-cover"
+      sizes="96px"
+    />
+  ) : (
+    <span className="text-5xl">📚</span>
+  )}
+</div>
+
+
 
                     <div className="min-w-0 flex-1">
                       <h2 className="text-xl font-bold text-slate-900">
@@ -258,5 +284,7 @@ export default function CartPage() {
         )}
       </div>
     </div>
+    <Footer/>
+    </>
   );
 }

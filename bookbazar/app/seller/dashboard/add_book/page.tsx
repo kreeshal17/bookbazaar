@@ -2,6 +2,8 @@
 
 import axios from "axios";
 import { FormEvent, useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 interface BookForm {
   title: string;
@@ -11,6 +13,7 @@ interface BookForm {
   price: string;
   stockQty: string;
   description: string;
+  imageUrl: string | null;
 }
 
 interface Book {
@@ -22,6 +25,7 @@ interface Book {
   isbn: string | null;
   price: number | string;
   stockQty: number;
+  imageUrl: string | null;
 }
 
 const emptyForm: BookForm = {
@@ -32,6 +36,7 @@ const emptyForm: BookForm = {
   price: "",
   stockQty: "",
   description: "",
+  imageUrl: "",
 };
 
 const categories = [
@@ -49,8 +54,11 @@ export default function AddBookPage() {
   const [editBookId, setEditBookId] = useState<string | null>(null);
   const [loadingBook, setLoadingBook] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   const isEditing = Boolean(editBookId);
 
@@ -64,13 +72,12 @@ export default function AddBookPage() {
       setLoadingBook(true);
       setError("");
       setMessage("");
-
       try {
         const response = await axios.get<{ book: Book }>(`/api/book/${bookId}`);
         const book = response.data.book;
-
         setForm({
           title: book.title || "",
+          imageUrl: book.imageUrl || "",
           author: book.author || "",
           isbn: book.isbn || "",
           categoryId: book.categoryId || "",
@@ -78,6 +85,7 @@ export default function AddBookPage() {
           stockQty: String(book.stockQty || ""),
           description: book.description || "",
         });
+        if (book.imageUrl) setPreview(book.imageUrl);
       } catch (err) {
         if (axios.isAxiosError(err)) {
           setError(err.response?.data?.message || "Unable to load this book.");
@@ -88,23 +96,27 @@ export default function AddBookPage() {
         setLoadingBook(false);
       }
     }
-
-    if (editBookId) {
-      loadBook(editBookId);
-    }
+    if (editBookId) loadBook(editBookId);
   }, [editBookId]);
 
   function updateField(field: keyof BookForm, value: string) {
-    setForm((current) => ({
-      ...current,
-      [field]: value,
-    }));
+    setForm((current) => ({ ...current, [field]: value }));
   }
 
   function resetForm() {
     setForm(emptyForm);
     setMessage("");
     setError("");
+    setFile(null);
+    setPreview(null);
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const selected = e.target.files?.[0] || null;
+    setFile(selected);
+    if (selected) {
+      setPreview(URL.createObjectURL(selected));
+    }
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -113,17 +125,31 @@ export default function AddBookPage() {
     setMessage("");
     setError("");
 
-    const payload = {
-      title: form.title,
-      author: form.author,
-      isbn: form.isbn,
-      categoryId: form.categoryId,
-      price: Number(form.price),
-      stockQty: Number(form.stockQty),
-      description: form.description,
-    };
-
     try {
+      let imageUrl = form.imageUrl;
+
+      if (file) {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append("file", file);
+        const uploadRes = await axios.post("/api/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        imageUrl = uploadRes.data.url;
+        setUploading(false);
+      }
+
+      const payload = {
+        title: form.title,
+        author: form.author,
+        isbn: form.isbn,
+        categoryId: form.categoryId,
+        price: Number(form.price),
+        stockQty: Number(form.stockQty),
+        description: form.description,
+        imageUrl,
+      };
+
       if (editBookId) {
         await axios.patch(`/api/book/${editBookId}`, payload);
         setMessage("Book updated successfully.");
@@ -131,6 +157,8 @@ export default function AddBookPage() {
         await axios.post("/api/book/create", payload);
         setMessage("Book added successfully.");
         setForm(emptyForm);
+        setFile(null);
+        setPreview(null);
       }
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -144,238 +172,284 @@ export default function AddBookPage() {
       }
     } finally {
       setSaving(false);
+      setUploading(false);
     }
   }
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-      <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-white p-5 shadow-xl md:p-10">
-        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      <div className="mx-auto max-w-6xl">
+        {/* Header */}
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-indigo-600">
+            <p className="mb-1 text-sm font-semibold uppercase tracking-widest text-indigo-600">
               {isEditing ? "Edit inventory" : "New inventory"}
             </p>
-
-            <h1 className="text-4xl font-bold text-slate-900">
+            <h1 className="text-3xl font-bold text-slate-900">
               {isEditing ? "Edit Book" : "Add New Book"}
             </h1>
-
-            <p className="mt-2 text-slate-500">
+            <p className="mt-1 text-slate-500">
               {isEditing
                 ? "Update the details for this store item."
                 : "Add a new book to your store inventory."}
             </p>
           </div>
-
-          <a
+          <Link
             href="/seller/dashboard/mybook"
-            className="rounded-xl border border-slate-300 px-5 py-3 text-center font-semibold text-slate-700 transition hover:border-indigo-300 hover:text-indigo-700"
+            className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-center text-sm font-semibold text-slate-700 shadow-sm transition hover:border-indigo-300 hover:text-indigo-700"
           >
-            View My Books
-          </a>
+            ← View My Books
+          </Link>
         </div>
 
         {loadingBook ? (
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-8 text-center font-medium text-slate-600">
+          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-slate-500 shadow-sm">
             Loading book details...
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+              {/* Left - Form */}
               <div className="space-y-6 lg:col-span-2">
                 {message && (
-                  <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 font-medium text-green-700">
-                    {message}
+                  <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+                    ✓ {message}
                   </div>
                 )}
-
                 {error && (
-                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 font-medium text-red-700">
-                    {error}
+                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                    ✕ {error}
                   </div>
                 )}
 
-                <div>
-                  <label className="mb-2 block font-medium text-slate-700">
-                    Book Title
-                  </label>
-
-                  <input
-                    type="text"
-                    value={form.title}
-                    onChange={(e) => updateField("title", e.target.value)}
-                    placeholder="Enter book title"
-                    required
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 text-black outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block font-medium text-slate-700">
-                    Author
-                  </label>
-
-                  <input
-                    type="text"
-                    value={form.author}
-                    onChange={(e) => updateField("author", e.target.value)}
-                    placeholder="Enter author name"
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 text-black outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block font-medium text-slate-700">
-                    ISBN
-                  </label>
-
-                  <input
-                    type="text"
-                    value={form.isbn}
-                    onChange={(e) => updateField("isbn", e.target.value)}
-                    placeholder="Enter ISBN number"
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 text-black outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block font-medium text-slate-700">
-                      Price
-                    </label>
-
-                    <input
-                      type="number"
-                      value={form.price}
-                      onChange={(e) => updateField("price", e.target.value)}
-                      placeholder="299"
-                      min="1"
-                      required
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-black outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block font-medium text-slate-700">
-                      Stock Quantity
-                    </label>
-
-                    <input
-                      type="number"
-                      value={form.stockQty}
-                      onChange={(e) => updateField("stockQty", e.target.value)}
-                      placeholder="10"
-                      min="0"
-                      required
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-black outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-                    />
+                {/* Basic Info */}
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">
+                    Basic Info
+                  </h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Book Title <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={form.title}
+                        onChange={(e) => updateField("title", e.target.value)}
+                        placeholder="Enter book title"
+                        required
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Author
+                      </label>
+                      <input
+                        type="text"
+                        value={form.author ?? ""}
+                        onChange={(e) => updateField("author", e.target.value)}
+                        placeholder="Enter author name"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        ISBN
+                      </label>
+                      <input
+                        type="text"
+                        value={form.isbn ?? ""}
+                        onChange={(e) => updateField("isbn", e.target.value)}
+                        placeholder="Enter ISBN number"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <label className="mb-2 block font-medium text-slate-700">
-                    Category
-                  </label>
-
-                  <select
-                    value={form.categoryId}
-                    onChange={(e) => updateField("categoryId", e.target.value)}
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 text-black outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map((category) => (
-                      <option key={category.value} value={category.value}>
-                        {category.label}
-                      </option>
-                    ))}
-                  </select>
+                {/* Pricing & Stock */}
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">
+                    Pricing & Stock
+                  </h2>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Price (NPR) <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">
+                          Rs.
+                        </span>
+                        <input
+                          type="number"
+                          value={form.price}
+                          onChange={(e) => updateField("price", e.target.value)}
+                          placeholder="299"
+                          min="1"
+                          required
+                          className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Stock Quantity <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        value={form.stockQty}
+                        onChange={(e) => updateField("stockQty", e.target.value)}
+                        placeholder="10"
+                        min="0"
+                        required
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="mb-2 block font-medium text-slate-700">
-                    Description
-                  </label>
-
-                  <textarea
-                    value={form.description}
-                    onChange={(e) => updateField("description", e.target.value)}
-                    rows={6}
-                    placeholder="Write book description..."
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3 text-black outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-                  />
+                {/* Category & Description */}
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">
+                    Details
+                  </h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Category
+                      </label>
+                      <select
+                        value={form.categoryId}
+                        onChange={(e) => updateField("categoryId", e.target.value)}
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                      >
+                        <option value="">Select Category</option>
+                        {categories.map((category) => (
+                          <option key={category.value} value={category.value}>
+                            {category.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Description
+                      </label>
+                      <textarea
+                        value={form.description}
+                        onChange={(e) => updateField("description", e.target.value)}
+                        rows={5}
+                        placeholder="Write book description..."
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                      />
+                    </div>
+                  </div>
                 </div>
 
+                {/* Image Upload */}
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">
+                    Book Cover
+                  </h2>
+                  <label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 p-8 transition hover:border-indigo-300 hover:bg-indigo-50">
+                    <span className="text-3xl">📷</span>
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-slate-700">
+                        Click to upload image
+                      </p>
+                      <p className="mt-1 text-xs text-slate-400">
+                        PNG, JPG, WEBP up to 10MB
+                      </p>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {file && (
+                    <p className="mt-3 text-center text-xs text-slate-500">
+                      ✓ Selected: {file.name}
+                    </p>
+                  )}
+                </div>
+
+                {/* Actions */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
                   {isEditing && (
                     <button
                       type="button"
                       onClick={resetForm}
-                      className="rounded-xl border border-slate-300 px-8 py-4 font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+                      className="rounded-xl border border-slate-200 bg-white px-8 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
                     >
                       Clear Changes
                     </button>
                   )}
-
                   <button
                     type="submit"
                     disabled={saving}
-                    className="rounded-xl bg-indigo-600 px-10 py-4 font-semibold text-white shadow-lg transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                    className="rounded-xl bg-indigo-600 px-10 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
                   >
-                    {saving
-                      ? "Saving..."
-                      : isEditing
-                        ? "Update Book"
-                        : "Add Book"}
+                    {uploading
+                      ? "Uploading image..."
+                      : saving
+                        ? "Saving..."
+                        : isEditing
+                          ? "Update Book"
+                          : "Add Book"}
                   </button>
                 </div>
               </div>
 
-              <div>
-                <div className="sticky top-6 rounded-3xl border border-slate-200 bg-slate-50 p-6">
-                  <div className="flex aspect-[3/4] items-center justify-center rounded-2xl bg-slate-200 text-7xl">
-                    📚
+              {/* Right - Preview */}
+              <div className="lg:col-span-1">
+                <div className="sticky top-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">
+                    Live Preview
+                  </p>
+
+                  <div className="relative mb-4 flex aspect-[3/4] items-center justify-center overflow-hidden rounded-xl bg-slate-100">
+                    {preview ? (
+                      <Image
+                        src={preview}
+                        alt="Book cover preview"
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <span className="text-6xl">📚</span>
+                    )}
                   </div>
 
-                  <div className="mt-6">
-                    <h2 className="text-2xl font-bold text-slate-900">
-                      {form.title || "Book Title"}
-                    </h2>
+                  <h2 className="text-lg font-bold text-slate-900">
+                    {form.title || "Book Title"}
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {form.author || "Author Name"}
+                  </p>
 
-                    <p className="mt-1 text-slate-500">
-                      {form.author || "Author Name"}
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                      Rs. {form.price || "0"}
+                    </span>
+                    <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                      Stock: {form.stockQty || "0"}
+                    </span>
+                    {form.categoryId && (
+                      <span className="rounded-full bg-indigo-100 px-3 py-1 text-xs font-medium text-indigo-700">
+                        {categories.find((c) => c.value === form.categoryId)?.label}
+                      </span>
+                    )}
+                  </div>
+
+                  {form.description && (
+                    <p className="mt-4 line-clamp-4 text-xs leading-relaxed text-slate-500">
+                      {form.description}
                     </p>
-
-                    <div className="mt-4 flex flex-wrap items-center gap-3">
-                      <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
-                        Rs. {form.price || "0"}
-                      </span>
-
-                      <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
-                        Stock {form.stockQty || "0"}
-                      </span>
-                    </div>
-
-                    <div className="mt-6">
-                      <h3 className="mb-2 font-semibold text-slate-700">
-                        Category
-                      </h3>
-
-                      <p className="text-slate-500">
-                        {form.categoryId || "No category selected"}
-                      </p>
-                    </div>
-
-                    <div className="mt-6">
-                      <h3 className="mb-2 font-semibold text-slate-700">
-                        Description
-                      </h3>
-
-                      <p className="line-clamp-6 text-sm text-slate-500">
-                        {form.description ||
-                          "Your book description will appear here as you type."}
-                      </p>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>

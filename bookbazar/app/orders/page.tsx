@@ -1,7 +1,10 @@
 'use client'
 
+import Navbar from "@/components/Navbar"
+import Footer from "@/components/home/footer"
 import axios from "axios"
 import { useEffect, useState } from "react"
+import Image from "next/image"
 
 interface Order {
   id: string
@@ -22,6 +25,7 @@ interface Order {
     book: {
       title: string
       author: string
+      imageUrl:string |null
     }
 
     store: {
@@ -46,6 +50,8 @@ export default function OrdersPage() {
   }, [])
 
   return (
+    <>
+    <Navbar/>
     <main className="min-h-screen bg-slate-50 py-12">
       <div className="mx-auto max-w-7xl px-6">
 
@@ -109,12 +115,21 @@ export default function OrdersPage() {
                       className="rounded-2xl bg-slate-50 p-5 border border-slate-100"
                     >
 
-                      <div className="flex gap-4">
+                      <div className="flex gap-25">
 
-                        <div className="flex h-20 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-2xl text-white">
-                          📚
-                        </div>
-
+                       <div className="flex h-32 w-full items-center justify-center rounded-xl bg-indigo-50 sm:w-24 overflow-hidden relative">
+                         {item.book.imageUrl ? (
+                           <Image
+                             src={item.book.imageUrl}
+                             alt={item.book.title}
+                             fill
+                             className="object-cover"
+                             sizes="96px"
+                           />
+                         ) : (
+                           <span className="text-5xl">📚</span>
+                         )}
+                       </div>
                         <div className="flex-1">
 
                           <h3 className="text-xl font-bold text-slate-900">
@@ -197,5 +212,7 @@ export default function OrdersPage() {
 
       </div>
     </main>
+    <Footer/>
+    </>
   )
 }

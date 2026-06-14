@@ -140,9 +140,9 @@ export default function Navbar() {
             <Link href="/orders" className="rounded-md px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors">
               My orders
             </Link>
-            <Link href="/cart-items" className="rounded-md px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors">
+            {/* <Link href="/cart-items" className="rounded-md px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors">
               History
-            </Link>
+            </Link> */}
 
             {/* Divider */}
             <div className="mx-2 h-5 w-px bg-slate-200" />

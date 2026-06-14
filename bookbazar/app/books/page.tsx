@@ -6,7 +6,7 @@ import axios from "axios";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-
+import Image from "next/image";
 interface Book {
   id: string;
   title: string;
@@ -14,6 +14,7 @@ interface Book {
   description: string | null;
   price: number;
   stockQty: number;
+  imageUrl:string |null
 }
 
 export default function BooksPage() {
@@ -126,12 +127,20 @@ function BooksContent() {
                   key={book.id}
                   className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
                 >
-                  <div className="flex h-64 items-center justify-center bg-gradient-to-br from-indigo-100 to-indigo-200 md:h-72">
-                    <div className="flex h-48 w-32 flex-col items-center justify-center rounded-xl bg-indigo-600 text-white shadow-xl md:h-52 md:w-36">
-                      <span className="text-5xl">📚</span>
-                      <span className="mt-4 text-sm font-bold">BookMandu</span>
-                    </div>
-                  </div>
+                 <div className="relative h-64 w-full overflow-hidden bg-gradient-to-br from-indigo-100 to-indigo-200 md:h-72">
+  {book.imageUrl ? (
+    <Image
+      src={book.imageUrl}
+      alt={book.title}
+      fill
+      className="object-cover transition-transform duration-300 group-hover:scale-105"
+    />
+  ) : (
+    <div className="flex h-full w-full items-center justify-center">
+      <span className="text-7xl">📚</span>
+    </div>
+  )}
+</div>
 
                   <div className="flex h-full flex-col p-5 md:p-6">
                     <h3 className="line-clamp-2 text-lg font-bold text-slate-900 transition-colors group-hover:text-indigo-600">

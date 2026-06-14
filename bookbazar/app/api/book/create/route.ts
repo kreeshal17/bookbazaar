@@ -139,6 +139,7 @@ const book=await prisma.book.create({
           categoryId,
           price:data.price,
           stockQty:data.stockQty,
+          imageUrl:data.imageUrl
 
 
 

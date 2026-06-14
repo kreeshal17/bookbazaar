@@ -97,7 +97,7 @@ return (
                     </svg>
                   ))}
                 </div>
-                <span className="text-xs text-slate-500 font-medium">(48)</span>
+                <span className="text-xs text-slate-500 font-medium"></span>
               </div>
 
               <h3 className="text-lg font-bold text-slate-900 line-clamp-2 group-hover:text-indigo-600 transition-colors">

@@ -3,6 +3,7 @@
 import axios from "axios";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 
 interface Book {
   id: string;
@@ -14,6 +15,7 @@ interface Book {
   isbn: string | null;
   price: number;
   stockQty: number;
+  imageUrl:string|null
 }
 
 export default function Page() {
@@ -126,7 +128,7 @@ export default function Page() {
             <p className="text-sm font-medium text-slate-500">
               Inventory Value
             </p>
-            <p className="mt-2 text-3xl font-bold">
+            <p className="mt-2 text-3xl font-boldIm">
               Rs. {inventoryValue.toLocaleString()}
             </p>
           </div>
@@ -153,9 +155,26 @@ export default function Page() {
                 className="flex min-h-72 flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex h-20 w-16 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-3xl">
-                    📚
-                  </div>
+                  
+
+
+
+                  <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-xl bg-indigo-50">
+  {book.imageUrl ? (
+    <Image
+      src={book.imageUrl}
+      alt={book.title}
+      fill
+      className="object-cover"
+    />
+  ) : (
+    <span className="flex h-full w-full items-center justify-center text-3xl">📚</span>
+  )}
+</div>
+
+
+
+
 
                   <div className="min-w-0">
                     <h2 className="line-clamp-2 text-xl font-bold">
@@ -209,3 +228,5 @@ export default function Page() {
     </div>
   );
 }
+
+

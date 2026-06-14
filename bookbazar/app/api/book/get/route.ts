@@ -1,12 +1,10 @@
 import { decrypt } from "@/app/lib/session";
 import prisma from "@/lib/prisma";
-
 import { cookies } from "next/headers";
 
-export async function GET()
-
-{
-const sessionCookie= await cookies()
+export async function GET() {
+  const startTime = Date.now();
+  const sessionCookie = await cookies();
 
 const sessionData= sessionCookie.get("session")?.value
 if(!sessionData)
@@ -58,17 +56,14 @@ if(!store)
 }
 
 
-const result= await prisma.book.findMany({
-    where:{
-        storeId:store.id
-    }
+const result = await prisma.book.findMany({
+    where: {
+      storeId: store.id,
+    },
+  });
 
+  const endTime = Date.now();
+  console.log(`GET /api/book/get resolved in ${endTime - startTime}ms`);
 
-
-})
-
-return Response.json({books:result})
-
-
-
+  return Response.json({ books: result });
 }

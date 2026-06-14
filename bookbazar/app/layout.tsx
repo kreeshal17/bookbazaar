@@ -17,11 +17,16 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "BookMandu | Buy & Sell Books Online",
+    default: "BookMandu",
     template: "%s | BookMandu",
   },
+  icons: {
+    icon: "/title.png",
+    shortcut: "/title.png",
+    apple: "/title.png",
+  },
   description:
-    "BookMandu is India's trusted online book marketplace to buy and sell new or used books. Discover textbooks, novels, comics, self-help, and more at unbeatable prices. List your books and earn today!",
+    "BookMandu is Nepal's trusted online book marketplace to buy and sell new or used books. Discover textbooks, novels, comics, self-help, and more at unbeatable prices. List your books and earn today!",
   keywords: [
     "buy books online",
     "sell books online",
@@ -57,7 +62,7 @@ export const metadata: Metadata = {
     locale: "en_IN",
     images: [
       {
-        url: "/og-image.png",
+        url: "",
         width: 1200,
         height: 630,
         alt: "BookMandu - Buy & Sell Books Online",

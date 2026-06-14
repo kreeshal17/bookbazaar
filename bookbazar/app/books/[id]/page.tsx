@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar"
 import Footer from "@/components/home/footer"
 import axios from "axios"
 import { useQRCode } from 'next-qrcode'
-
+import Image from "next/image"
 
 import Addtocart from "@/components/books/addtocart"
 import BookQRCode from "@/components/books/BookQRCode"
@@ -68,21 +68,58 @@ console.log(book);
           <div className="grid gap-12 md:grid-cols-5 lg:gap-16">
 
             {/* Book Cover - Left */}
-            <div className="md:col-span-2">
-              <div className="sticky top-24 rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 p-8 shadow-2xl overflow-hidden">
-                <div className="flex h-96 w-full items-center justify-center rounded-2xl bg-white/10 backdrop-blur text-9xl">
-                  📚
-                </div>
-                
-                {/* Stock Badge */}
-                <div className="mt-6 flex items-center gap-3 rounded-xl bg-white/20 backdrop-blur p-4">
-                  <span className={`inline-block h-3 w-3 rounded-full ${book.stockQty > 0 ? 'bg-green-400' : 'bg-red-400'}`}></span>
-                  <span className="text-white font-semibold">
-                    {book.stockQty > 0 ? `${book.stockQty} in stock` : 'Out of stock'}
-                  </span>
-                </div>
-              </div>
-            </div>
+         {/* Book Cover - Left */}
+{/* Book Cover - Left */}
+<div className="md:col-span-2">
+  <div className="sticky top-24 space-y-4">
+    
+    {/* Image Container */}
+    <div className="relative overflow-hidden rounded-3xl shadow-2xl w-full aspect-[2/3]">
+      {book.imageUrl ? (
+        <>
+          <Image
+            src={book.imageUrl}
+            alt={book.title}
+            fill
+            className="object-cover object-center"
+            sizes="(max-width: 768px) 100vw, 40vw"
+          />
+          {/* Subtle gradient overlay at bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        </>
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600">
+          <div className="text-center">
+            <span className="text-8xl">📚</span>
+            <p className="mt-4 text-sm font-semibold text-white/80">No cover available</p>
+          </div>
+        </div>
+      )}
+    </div>
+
+    {/* Stock Badge */}
+    <div className={`flex items-center gap-3 rounded-2xl border px-5 py-4 shadow-sm ${
+      book.stockQty > 0
+        ? "border-green-100 bg-green-50"
+        : "border-red-100 bg-red-50"
+    }`}>
+      <span className={`h-3 w-3 shrink-0 rounded-full ${
+        book.stockQty > 0 ? "bg-green-500" : "bg-red-500"
+      }`} />
+      <div>
+        <p className={`text-sm font-semibold ${
+          book.stockQty > 0 ? "text-green-700" : "text-red-700"
+        }`}>
+          {book.stockQty > 0 ? "In Stock" : "Out of Stock"}
+        </p>
+        {book.stockQty > 0 && (
+          <p className="text-xs text-green-600">{book.stockQty} copies available</p>
+        )}
+      </div>
+    </div>
+
+  </div>
+</div>
 
             {/* Book Details - Right */}
             <div className="md:col-span-3 flex flex-col">

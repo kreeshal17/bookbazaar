@@ -43,7 +43,7 @@ export default function Hero() {
             <div className="mt-10 flex justify-center gap-8">
               <div>
                 <h3 className="text-3xl font-bold text-slate-900">
-                  10K+
+                  1k+
                 </h3>
                 <p className="text-slate-500">
                   Books
@@ -52,7 +52,7 @@ export default function Hero() {
 
               <div>
                 <h3 className="text-3xl font-bold text-slate-900">
-                  500+
+                  50+
                 </h3>
                 <p className="text-slate-500">
                   Sellers
@@ -61,7 +61,7 @@ export default function Hero() {
 
               <div>
                 <h3 className="text-3xl font-bold text-slate-900">
-                  15K+
+                       200+ 
                 </h3>
                 <p className="text-slate-500">
                   Readers
