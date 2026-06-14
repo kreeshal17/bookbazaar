@@ -35,71 +35,49 @@ export async function POST(req:Request){
 
 
     }
+const attempts = await redis.get(`login:${result.data.email}`)
 
-    const attempts= await redis.get(`login:${result.data.email}`)
-
-    if(Number(attempts)>=5)
-    {
-        return Response.json({
-              message:"Too many login attempts"
-    },
-    {
-      status:429
-    })
-        }
-    
-
-        
-
-    const user=await prisma.user.findUnique({
-    where:{
-        email:result.data.email
-    },
-
-    })
-
-    if(!user)
-    {
-     return Response.json({
-
-        message:"error no user found"
-     })
-
-
-    }
-
-
-    const store = await prisma.store.findUnique({
-  where: {
-    sellerId: user.id
-  }
-})
-
-
-
-
-
-const password=result.data.password
-   
-
-     const validation=await  bcrypt.compare(password,user.password_hash)
-console.log("VALIDATION:", validation)
-if(!validation)
-{
-
-    await redis.incr(`login:${result.data.email}`)
-
-     await redis.expire(
-      `login:${result.data.email}`,
-      900
-    )
+if (Number(attempts) >= 5) {
     return Response.json({
-        message:"password and email doesnot matched"
-    },{
-        status:401
+        message: "Too many login attempts"
+    }, {
+        status: 429
     })
 }
 
+const user = await prisma.user.findUnique({
+    where: {
+        email: result.data.email
+    },
+})
+
+if (!user) {
+    return Response.json({
+        message: "error no user found"
+    })
+}
+
+const store = await prisma.store.findUnique({
+    where: {
+        sellerId: user.id
+    }
+})
+
+const password = result.data.password
+
+const validation = await bcrypt.compare(password, user.password_hash)
+console.log("VALIDATION:", validation)
+if (!validation) {
+    const newCount = await redis.incr(`login:${result.data.email}`)
+    if (newCount === 1) {
+        await redis.expire(`login:${result.data.email}`, 900)
+    }
+    return Response.json({
+        message: "password and email doesnot matched"
+    }, {
+        status: 401
+    })
+}
 
 const session = {
   id: user.id,
