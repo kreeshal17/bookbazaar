@@ -23,7 +23,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  
     async function getBooks() {
       try {
         const response = await axios.get("/api/book/get");
@@ -38,9 +38,12 @@ export default function Page() {
         setLoading(false);
       }
     }
+    useEffect(()=>{
+      getBooks()
 
-    getBooks();
-  }, []);
+    },[])
+
+   
 
   const totalStock = useMemo(
     () => books.reduce((acc, book) => acc + book.stockQty, 0),
@@ -55,6 +58,16 @@ export default function Page() {
       ),
     [books]
   );
+
+const handleDelete=async(bookId:string)=>{
+
+if(!confirm("Are you sure you want to delete it")) return
+await axios.delete(`/api/book/${bookId}`)
+await getBooks()
+
+}
+
+
 
   if (loading) {
     return (
@@ -216,7 +229,14 @@ export default function Page() {
                     Edit
                   </Link>
 
-                  <button className="flex-1 rounded-xl border border-red-200 px-4 py-2.5 font-semibold text-red-600 transition hover:bg-red-50">
+                  <button
+                  
+                  onClick={
+                    ()=>handleDelete(book.id)
+                  }
+                  
+                  
+                  className="flex-1 rounded-xl border border-red-200 px-4 py-2.5 font-semibold text-red-600 transition hover:bg-red-50">
                     Delete
                   </button>
                 </div>

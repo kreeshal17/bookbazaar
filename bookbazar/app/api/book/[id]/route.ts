@@ -25,24 +25,15 @@ const categoryLabels: Record<string, string> = {
 };
 
 async function getCategoryId(categoryId?: string) {
-  if (!categoryId) {
-    return null;
-  }
+  if (!categoryId) return null;
 
   const slug = categoryId.trim().toLowerCase();
   const name = categoryLabels[slug] || categoryId;
 
   const category = await prisma.category.upsert({
-    where: {
-      slug,
-    },
-    update: {
-      name,
-    },
-    create: {
-      name,
-      slug,
-    },
+    where: { slug },
+    update: { name },
+    create: { name, slug },
   });
 
   return category.id;
@@ -63,9 +54,7 @@ async function getSellerStore() {
   }
 
   const store = await prisma.store.findUnique({
-    where: {
-      sellerId: payload.id as string,
-    },
+    where: { sellerId: payload.id as string },
   });
 
   if (!store) {
@@ -82,18 +71,11 @@ export async function GET(
   const { id } = await context.params;
   const { store, error } = await getSellerStore();
 
-  if (error) {
-    return error;
-  }
+  if (error) return error;
 
   const book = await prisma.book.findFirst({
-    where: {
-      id,
-      storeId: store.id,
-    },
-    include: {
-      category: true,
-    },
+    where: { id, storeId: store.id },
+    include: { category: true },
   });
 
   if (!book) {
@@ -122,15 +104,10 @@ export async function PATCH(
 
   const { store, error } = await getSellerStore();
 
-  if (error) {
-    return error;
-  }
+  if (error) return error;
 
   const existingBook = await prisma.book.findFirst({
-    where: {
-      id,
-      storeId: store.id,
-    },
+    where: { id, storeId: store.id },
   });
 
   if (!existingBook) {
@@ -141,9 +118,7 @@ export async function PATCH(
   const categoryId = await getCategoryId(data.categoryId);
 
   const book = await prisma.book.update({
-    where: {
-      id,
-    },
+    where: { id },
     data: {
       title: data.title,
       description: data.description,
@@ -152,11 +127,34 @@ export async function PATCH(
       categoryId,
       price: data.price,
       stockQty: data.stockQty,
+      imageUrl: data.imageUrl,
     },
   });
 
-  return Response.json({
-    message: "Book updated successfully",
-    book,
+  return Response.json({ message: "Book updated successfully", book });
+}
+
+export async function DELETE(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
+  const { store, error } = await getSellerStore();
+
+  if (error) return error;
+
+  const existingBook = await prisma.book.findFirst({
+    where: { id, storeId: store.id },
   });
+
+  if (!existingBook) {
+    return Response.json({ message: "Book not found" }, { status: 404 });
+  }
+
+await prisma.book.update({
+  where: { id },
+  data: { isActive: false },
+});
+
+return Response.json({ message: "Book deleted successfully" });
 }

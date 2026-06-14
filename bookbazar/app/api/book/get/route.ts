@@ -59,6 +59,7 @@ if(!store)
 const result = await prisma.book.findMany({
     where: {
       storeId: store.id,
+      isActive:true
     },
   });
 

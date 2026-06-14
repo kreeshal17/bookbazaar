@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-
+import { useRouter } from "next/navigation";
 interface book{
 id:string
 quantity:number
@@ -21,6 +21,8 @@ const [fullName, setName] = useState('');
   const [state, setState] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const[books,setBooks]= useState<book[]>([])
+
+  const router= useRouter()
 const[paymentMethod,setPaymentMethod]=useState("COD")
 const handleSubmit=async (e:any)=>{
 e.preventDefault()
@@ -39,6 +41,8 @@ e.preventDefault()
  if(response.data)
  {
     alert("sucessfully submitted")
+    router.push("/orders")
+
  }
 
 }
