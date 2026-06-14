@@ -1,316 +1,236 @@
 'use client'
 import { useEffect, useState } from "react";
 import axios from "axios";
-
 import { useRouter } from "next/navigation";
-interface book{
-id:string
-quantity:number
-book:{
-title:string
-description:string
-author:string
-price:number
+
+interface book {
+  id: string
+  quantity: number
+  book: {
+    title: string
+    description: string
+    author: string
+    price: number
+  }
 }
-}
-export default function checkout(){
-const [fullName, setName] = useState('');
+
+export default function checkout() {
+  const [fullName, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [postalCode, setPostalCode] = useState('');
-  const[books,setBooks]= useState<book[]>([])
+  const [books, setBooks] = useState<book[]>([])
+  const router = useRouter()
+  const [paymentMethod, setPaymentMethod] = useState("COD")
 
-  const router= useRouter()
-const[paymentMethod,setPaymentMethod]=useState("COD")
-const handleSubmit=async (e:any)=>{
-e.preventDefault()
- const response= await axios.post("/api/order/create",{
-    fullName,
-    phone,
-    shippingAddr:address,
-    city,
-    state,
-    postalCode
-    
-
-
-
- })
- if(response.data)
- {
-    alert("sucessfully submitted")
-    router.push("/orders")
-
- }
-
-}
-
-
-
-useEffect(()=>{
-
-const  fetch=async()=>{
-
-
-
-    const response= await axios.get("api/cart/get")
-
-    if(response.data)
-    {
-        setBooks(response.data)
+  const handleSubmit = async (e: any) => {
+    e.preventDefault()
+    const response = await axios.post("/api/order/create", {
+      fullName,
+      phone,
+      shippingAddr: address,
+      city,
+      state,
+      postalCode
+    })
+    if (response.data) {
+      alert("sucessfully submitted")
+      router.push("/orders")
     }
+  }
 
+  useEffect(() => {
+    const fetch = async () => {
+      const response = await axios.get("api/cart/get")
+      if (response.data) {
+        setBooks(response.data)
+      }
+    }
+    fetch()
+  }, [])
 
+  const total = books.reduce((sum, items) => sum + items.quantity * items.book.price, 0)
 
+  return (
+    <div className="min-h-screen bg-slate-50 py-8 px-4 md:py-12 md:px-6">
+      <div className="mx-auto max-w-7xl">
 
+        {/* Header */}
+        <div className="mb-8">
+          <p className="text-sm font-semibold uppercase tracking-widest text-indigo-600">Almost there</p>
+          <h1 className="mt-1 text-2xl font-bold text-slate-900 md:text-3xl">Checkout</h1>
+        </div>
 
-}
-fetch()
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
 
-},[])
+          {/* Shipping Form */}
+          <div className="w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8 lg:w-1/2">
+            <h2 className="mb-6 text-xl font-bold text-slate-900 md:text-2xl">
+              Shipping Information
+            </h2>
 
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-black">
 
-const total= books.reduce( (sum,items)=>
-    sum+items.quantity*items.book.price
-,0
-
-
-
-)
-
-
-
-return (
-  <div className="min-h-screen bg-slate-50 py-12">
-    <div className="mx-auto max-w-7xl px-6 flex gap-10 items-start">
-
-      {/* Shipping Form */}
-      <div className="w-1/2 rounded-3xl bg-white p-8 shadow-lg border border-slate-100">
-
-        <h2 className="mb-8 text-3xl font-bold text-slate-900">
-          Shipping Information
-        </h2>
-
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-5  text-black"
-        >
-
-          <div className=" text-black">
-            <label className="mb-2 block font-medium text-slate-700">
-              Full Name
-            </label>
-
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block font-medium text-slate-700">
-              Phone Number
-            </label>
-
-            <input
-              type="text"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block font-medium text-slate-700">
-              Address
-            </label>
-
-            <input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
-            />
-          </div>
-
-          <div className="flex gap-4">
-
-            <div className="flex-1">
-              <label className="mb-2 block font-medium text-slate-700">
-                City
-              </label>
-
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
-              />
-            </div>
-
-            <div className="flex-1">
-              <label className="mb-2 block font-medium text-slate-700">
-                State
-              </label>
-
-              <input
-                type="text"
-                value={state}
-                onChange={(e) => setState(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
-              />
-            </div>
-
-          </div>
-
-          <div>
-            <label className="mb-2 block font-medium text-slate-700">
-              Postal Code
-            </label>
-
-            <input
-              type="text"
-              value={postalCode}
-              onChange={(e) => setPostalCode(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-indigo-500"
-            />
-            
-          </div>
-  <div className="mt-6">
-
-  <h3 className="mb-4 text-lg font-bold text-slate-900">
-    Payment Method
-  </h3>
-
-  <label className="flex cursor-pointer items-center gap-4 rounded-2xl border border-indigo-200 bg-indigo-50 p-4 transition hover:border-indigo-400">
-
-    <input
-      type="radio"
-      name="payment"
-      value="COD"
-      checked={paymentMethod === "COD"}
-      onChange={(e) => setPaymentMethod(e.target.value)}
-      className="h-5 w-5"
-    />
-
-    <div>
-      <p className="font-semibold text-slate-900">
-        Cash on Delivery
-      </p>
-
-      <p className="text-sm text-slate-500">
-        Pay when your order arrives.
-      </p>
-    </div>
-
-  </label>
-
-</div>
-          <button
-            type="submit"
-            className="mt-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-4 font-bold text-white shadow-lg transition hover:scale-[1.02]"
-          >
-            Place Order
-          </button>
-
-        </form>
-      </div>
-
-      {/* Order Summary */}
-      <div className="w-1/2">
-
-        <h1 className="mb-8 text-3xl font-bold text-slate-900">
-          Order Summary
-        </h1>
-
-        <div className="space-y-6">
-
-          {books.map((c) => (
-
-            <div
-              key={c.id}
-              className="rounded-3xl bg-white p-6 shadow-lg border border-slate-100 hover:shadow-xl transition"
-            >
-
-              <div className="flex gap-6">
-
-                <div className="flex h-40 w-28 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-5xl text-white">
-                  📚
-                </div>
-
-                <div className="flex flex-1 flex-col">
-
-                  <h2 className="text-2xl font-bold text-slate-900">
-                    {c.book.title}
-                  </h2>
-
-                  <p className="mt-2 text-slate-500">
-                    ✍️ {c.book.author}
-                  </p>
-
-                  <p className="mt-4 text-sm text-slate-600">
-                    {c.book.description}
-                  </p>
-
-                  <div className="mt-6 flex flex-wrap items-center gap-4">
-
-                    <span className="rounded-full bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-600">
-                      Qty: {c.quantity}
-                    </span>
-
-                    <span className="text-lg font-bold text-slate-900">
-                      ₹ {c.book.price}
-                    </span>
-
-                    <span className="text-lg font-bold text-green-600">
-                      Total: ₹ {c.quantity * c.book.price}
-                    </span>
-
-                  </div>
-
-                </div>
-
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="John Doe"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                />
               </div>
 
-            </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                  Phone Number
+                </label>
+                <input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+977 98XXXXXXXX"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                />
+              </div>
 
-          ))}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Street address"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                />
+              </div>
 
-        </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">City</label>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="Kathmandu"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">State</label>
+                  <input
+                    type="text"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    placeholder="Bagmati"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                  />
+                </div>
+              </div>
 
-        <div className="mt-8 rounded-3xl bg-gradient-to-r from-indigo-50 to-purple-50 p-6 border border-indigo-100">
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                  Postal Code
+                </label>
+                <input
+                  type="text"
+                  value={postalCode}
+                  onChange={(e) => setPostalCode(e.target.value)}
+                  placeholder="44600"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                />
+              </div>
 
-          <div className="flex items-center justify-between">
+              {/* Payment Method */}
+              <div className="mt-2">
+                <h3 className="mb-3 text-sm font-semibold uppercase tracking-widest text-slate-400">
+                  Payment Method
+                </h3>
+                <label className="flex cursor-pointer items-center gap-4 rounded-xl border border-indigo-200 bg-indigo-50 p-4 transition hover:border-indigo-400">
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="COD"
+                    checked={paymentMethod === "COD"}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="h-4 w-4 accent-indigo-600"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">Cash on Delivery</p>
+                    <p className="text-xs text-slate-500">Pay when your order arrives.</p>
+                  </div>
+                </label>
+              </div>
 
-            <span className="text-xl font-semibold text-slate-700">
-              Grand Total
-            </span>
+              <button
+                type="submit"
+                className="mt-2 w-full rounded-xl bg-indigo-600 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-indigo-700 active:scale-95"
+              >
+                Place Order
+              </button>
 
-            <span className="text-4xl font-bold text-indigo-600">
-              ₹ {total}
-            </span>
-
+            </form>
           </div>
 
+          {/* Order Summary */}
+          <div className="w-full lg:w-1/2">
+            <h2 className="mb-4 text-xl font-bold text-slate-900 md:text-2xl">
+              Order Summary
+            </h2>
+
+            <div className="space-y-4">
+              {books.map((c) => (
+                <div
+                  key={c.id}
+                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
+                >
+                  <div className="flex gap-4">
+                    <div className="flex h-24 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-3xl text-white md:h-28 md:w-20">
+                      📚
+                    </div>
+                    <div className="flex flex-1 flex-col justify-between">
+                      <div>
+                        <h3 className="font-bold text-slate-900 line-clamp-1">{c.book.title}</h3>
+                        <p className="mt-0.5 text-xs text-slate-500">✍️ {c.book.author}</p>
+                        <p className="mt-2 line-clamp-2 text-xs text-slate-500">{c.book.description}</p>
+                      </div>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600">
+                          Qty: {c.quantity}
+                        </span>
+                        <span className="text-sm font-bold text-slate-900">
+                          Rs. {c.book.price}
+                        </span>
+                        <span className="text-sm font-bold text-green-600">
+                          = Rs. {c.quantity * c.book.price}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Grand Total */}
+            <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-5">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-slate-700">Grand Total</span>
+                <span className="text-2xl font-bold text-indigo-600 md:text-3xl">
+                  Rs. {total}
+                </span>
+              </div>
+            </div>
+
+          </div>
         </div>
-
       </div>
-
     </div>
-  </div>
-)
-
-
-
-
-
-
-
-
-
-
+  )
 }

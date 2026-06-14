@@ -1,36 +1,217 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+```markdown
+# BookMandu
+
+BookMandu is a full-stack online book marketplace built with Next.js 16, PostgreSQL, Prisma, Redis, and Cloudinary. It connects buyers, sellers, and administrators through a seamless book-buying and selling experience.
+
+🌐 **Live Demo:** [bookmandu.vercel.app](https://www.bookmandu.vercel.app)
+
+---
+
+## Features
+
+### Buyer
+- Browse active book listings across all stores
+- Search books by title, au
+- View detailed book pages with cover image, description, author, price, and ISBN
+- Add books to cart and manage cart items
+- Checkout with shipping details (name, phone, address, city, state, postal code)
+- View order history and track order status
+
+### Seller
+- Register and create a store
+- Add books with title, author, ISBN, category, price, stock quantity, description, and cover image
+- Upload book cover images via Cloudinary
+- Edit and soft-delete book listings
+- View and manage incoming orders
+- Update order status
+
+### Admin
+- Manage users and sellers
+- Approve or reject seller applications
+- Ban or unban seller accounts
+- Monitor platform activity and listings
+
+### Auth and Security
+- Email and password signup and login
+- JWT session cookies signed with `jose`
+- Passwords hashed with `bcryptjs`
+- Login rate limiting with Redis — blocks after repeated failed attempts, resets after 15 minutes
+- Role-based middleware protecting `/admin`, `/seller`, and `/buyer` routes
+
+### AI Chatbot
+- Built-in AI book assistant powered by Google Gemini via the Vercel AI SDK
+- Answers buyer questions about available books
+- Recommends titles based on user queries
+- Provides pricing and store information
+- Strictly limited to books listed on the platform — no hallucination outside inventory
+
+### Media
+- Book cover image uploads handled server-side via Cloudinary
+- Optimized image delivery with Next.js Image component
+- Secure upload flow — API secret never exposed to the client
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS |
+| Backend | Next.js API Routes, REST APIs |
+| Database | PostgreSQL (Neon) |
+| ORM | Prisma 7 |
+| Auth | JWT, jose, bcryptjs |
+| Storage | Cloudinary |
+| Caching & Rate Limiting | Redis (Upstash) |
+| AI | Google Gemini via Vercel AI SDK |
+| Deployment | Vercel |
+
+---
+
+## Repository Structure
+
+```
+bookbazaar/
+├── app/
+│   ├── api/              # REST API endpoints
+│   │   ├── auth/         # Login, signup, logout
+│   │   ├── book/         # Book CRUD
+│   │   ├── cart/         # Cart management
+│   │   ├── order/        # Order creation and tracking
+│   │   ├── seller/       # Seller order management
+│   │   ├── store/        # Store creation
+│   │   ├── upload/       # Cloudinary image upload
+│   │   └── chat/         # AI chatbot
+│   ├── lib/              # Session and definitions
+│   ├── buyer/            # Buyer pages
+│   ├── seller/           # Seller dashboard pages
+│   ├── admin/            # Admin dashboard pages
+│   └── components/       # Shared UI components
+├── components/           # Global components (Navbar, Footer)
+├── lib/                  # Prisma client, Redis client, utilities
+├── prisma/               # Schema and migrations
+└── public/               # Static assets
+```
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+
+- PostgreSQL database (Neon recommended)
+- Redis server (Upstash recommended)
+- Cloudinary account
+
+### Install dependencies
+
+```bash
+cd bookbazaar
+npm install
+```
+
+### Environment variables
+
+Create a `.env` file in the `bookbazaar/` directory:
+
+```env
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
+SESSION_SECRET=your-session-secret
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-key
+CLOUDINARY_API_SECRET=your-cloudinary-secret
+REDIS_URL=rediss://default:password@your-upstash-host:6379
+GOOGLE_GENERATIVE_AI_API_KEY=your-gemini-api-key
+```
+
+### Generate Prisma client and run migrations
+
+```bash
+npx prisma generate
+npx prisma migrate deploy
+```
+
+### Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the development server |
+| `npm run build` | Generate Prisma client and build for production |
+| `npm run start` | Run the production build |
+| `npm run lint` | Run ESLint |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Auth Flow
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Signup and login handled via `app/api/auth/`
+- Passwords hashed with `bcryptjs` before storage
+- On login, a signed JWT is issued as an HTTP-only session cookie using `jose`
+- Middleware checks the session cookie and decodes the role to protect routes
+- Redis tracks failed login attempts per email — rate limited to prevent brute-force attacks
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Database Schema
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Model | Description |
+|---|---|
+| `User` | Buyers, sellers, and admins |
+| `Store` | Belongs to a seller, contains book listings |
+| `Book` | Belongs to a store, supports soft delete via `isActive` |
+| `Category` | Book categories with slug-based upsert |
+| `CartItem` | Buyer cart before checkout |
+| `Order` | Checkout order with shipping details |
+| `OrderItem` | Individual books within an order |
+
+---
+
+## Book Lifecycle
+
+1. Seller creates a book listing with cover image upload
+2. Book is stored with `isActive: true`
+3. Buyers browse and add books to cart
+4. On checkout, an order is created with order items
+5. Seller views and updates order status
+6. If a seller deletes a book, it is soft-deleted (`isActive: false`) — order history is preserved
+
+---
+
+## Troubleshooting
+
+- If login fails repeatedly, wait 15 minutes for the rate limit to reset
+- Ensure `SESSION_SECRET` is set before starting the server
+- Confirm `DATABASE_URL` uses a valid PostgreSQL connection string
+- Add `res.cloudinary.com` to `remotePatterns` in `next.config.ts` for image rendering
+- Vercel deployments require all environment variables set in the Vercel dashboard
+
+---
+
+## Future Improvements
+
+- Payment gateway integration (eSewa, Khalti)
+- Book reviews and ratings system
+- Seller analytics dashboard
+- Email notifications for order updates
+- Wishlist and saved books feature
+- Advanced search with price range and condition filters
+- Mobile app
+
+---
+
+## License
+
+MIT
+```
+
