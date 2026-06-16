@@ -76,3 +76,13 @@ export type OrderItem = Prisma.OrderItemModel
  * 
  */
 export type CartItem = Prisma.CartItemModel
+/**
+ * Model VerificationToken
+ * 
+ */
+export type VerificationToken = Prisma.VerificationTokenModel
+/**
+ * Model PasswordResetToken
+ * 
+ */
+export type PasswordResetToken = Prisma.PasswordResetTokenModel

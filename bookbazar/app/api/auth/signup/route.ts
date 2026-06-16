@@ -1,7 +1,8 @@
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { userSchema } from "@/prisma/schemas/user.schemas";
-
+import { randomBytes } from "crypto";
+import { sendVerificationEmail } from "@/lib/resend/sendverificationemail";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -46,6 +47,20 @@ export async function POST(req: Request) {
         role: data.role,
       },
     });
+
+    console.log("User created");
+  const token= randomBytes(32).toString("hex")
+    await prisma.verificationToken.create({
+      data:{
+        token,
+        userId:user.id,
+        expiresAt:new Date(Date.now()+10*60*1000)
+      }
+    })
+    console.log("Token created");
+
+    await sendVerificationEmail(data.email,token,data.name)
+    console.log("Email sent");
 
     return Response.json(
       {

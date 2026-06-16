@@ -9,43 +9,43 @@ export default function Login() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const router= useRouter()
-  async function handleForm(e:any) {
+async function handleForm(e:any) {
     e.preventDefault()
-try{
-    const response = await axios.post("/api/auth/login", {
-      email,
-      password,
-    })
+    try {
+      const response = await axios.post("/api/auth/login", {
+        email,
+        password,
+      })
 
-    if(response.data.role=="ADMIN")
-    {
-      router.push("/admin")
+      if(response.data.role == "ADMIN") {
+        router.push("/admin")
+      }
+
+      if (response.data.role === "SELLER") {
+        if (response.data.hasStore) {
+          router.push("/seller/dashboard")
+        } else {
+          router.push("/seller/onboard")
+        }
+      }
+
+      if (response.data.role === "BUYER") {
+        router.push("/")
+      }
+
+    } catch(error:any) {
+      if(error.response.status === 429) {
+        alert("Too many attempts, retry after sometime")
+      }
+
+     if(error.response.status === 403) {
+  alert("Please verify your email. We've sent a new verification email to your inbox.")
+}
+      if(error.response.status === 401) {
+        alert("Invalid email or password")
+      }
     }
-    console.log(response.data)
-  
-
-if (response.data.role === "SELLER") {
-
-  if (response.data.hasStore) {
-    router.push("/seller/dashboard")
-  } else {
-    router.push("/seller/onboard")
   }
-
-}
-
-if (response.data.role === "BUYER") {
-  router.push("/")
-}
-}
-catch(error:any)
-{
-  if(error.response.status==429)
-  {
-    alert("too many attempt retry after sometime")
-  }
-}
-}
 
  return (
   <div className="min-h-screen flex bg-slate-50">
@@ -102,12 +102,12 @@ catch(error:any)
                 Remember me
               </label>
 
-              <a
-                href="#"
-                className="text-indigo-600 hover:text-indigo-700"
-              >
-                Forgot Password?
-              </a>
+           <Link
+  href="/forgot-password"
+  className="text-indigo-600 hover:text-indigo-700"
+>
+  Forgot Password?
+</Link>
             </div>
 
             <button
@@ -127,7 +127,7 @@ catch(error:any)
             <div className="h-px flex-1 bg-slate-200" />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          {/* <div className="grid grid-cols-2 gap-3">
             <button className="rounded-xl border border-slate-300 py-3 font-medium text-slate-700 transition hover:bg-slate-100 hover:border-slate-400">
               Google
             </button>
@@ -135,7 +135,7 @@ catch(error:any)
             <button className="rounded-xl border border-slate-300 py-3 font-medium text-slate-700 transition hover:bg-slate-100 hover:border-slate-400">
               GitHub
             </button>
-          </div>
+          </div> */}
 
           <p className="mt-6 text-center text-sm text-slate-500">
             Don't have an account?{" "}

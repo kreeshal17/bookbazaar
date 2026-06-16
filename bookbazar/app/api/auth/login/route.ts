@@ -4,91 +4,82 @@ import prisma from '@/lib/prisma'
 import { cookies } from 'next/headers'
 import { encrypt } from '@/app/lib/session'
 import redis from '@/lib/redis/redis'
+import { NextRequest } from 'next/server'
+import { sendVerificationEmail } from '@/lib/resend/sendverificationemail'
+import { randomBytes } from 'crypto'
 
-const loginSchema=z.object({
-    
-    email:z.email(),
-    password:z.string().min(8,"password must be of 8 integers")
-    
-    
-    
+const loginSchema = z.object({
+  email: z.email(),
+  password: z.string().min(8, "password must be of 8 integers")
 })
 
+export async function POST(req: NextRequest) {
+  const cookieStore = await cookies()
+  const body = await req.json()
+  const result = loginSchema.safeParse(body)
 
-export async function POST(req:Request){
-    const cookieStore= await cookies()
+  if (!result.success) {
+    return Response.json({ message: result.error.message }, { status: 401 })
+  }
 
-    
-    const body= await req.json()
-    const result=loginSchema.safeParse(body)
-    
-    if(!result.success)
-    {
-        return Response.json({
-              message: result.error.message
+  const attempts = await redis.get(`login:${result.data.email}`)
+  if (Number(attempts) >= 5) {
+    return Response.json({ message: "Too many login attempts" }, { status: 429 })
+  }
 
+  const user = await prisma.user.findUnique({
+    where: { email: result.data.email }
+  })
 
-        },{
-            status:401
+  if (!user) {
+    return Response.json({ message: "No user found" }, { status: 404 })
+  }
+
+  if (!user.isVerified) {
+    const existingToken = await prisma.verificationToken.findFirst({ 
+        where: { userId: user.id } 
+    })
+
+    if (!existingToken) {
+        const tokenx = randomBytes(32).toString('hex')
+        await prisma.verificationToken.create({
+            data: {
+                token: tokenx,
+                userId: user.id,
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            },
         })
-
-
-
+        await sendVerificationEmail(result.data.email, tokenx, user.full_name)
     }
-const attempts = await redis.get(`login:${result.data.email}`)
 
-if (Number(attempts) >= 5) {
     return Response.json({
-        message: "Too many login attempts"
-    }, {
-        status: 429
-    })
+        message: "Please verify your email. Check your inbox."
+    }, { status: 403 })
 }
 
-const user = await prisma.user.findUnique({
-    where: {
-        email: result.data.email
-    },
-})
-
-if (!user) {
-    return Response.json({
-        message: "error no user found"
-    })
-}
-
-const store = await prisma.store.findUnique({
-    where: {
-        sellerId: user.id
-    }
-})
-
-const password = result.data.password
-
-const validation = await bcrypt.compare(password, user.password_hash)
-console.log("VALIDATION:", validation)
-if (!validation) {
+  const validation = await bcrypt.compare(result.data.password, user.password_hash)
+  if (!validation) {
     const newCount = await redis.incr(`login:${result.data.email}`)
     if (newCount === 1) {
-        await redis.expire(`login:${result.data.email}`, 900)
+      await redis.expire(`login:${result.data.email}`, 900)
     }
-    return Response.json({
-        message: "password and email doesnot matched"
-    }, {
-        status: 401
-    })
-}
+    return Response.json({ message: "Invalid email or password" }, { status: 401 })
+  }
 
-const session = {
-  id: user.id,
-  email: user.email,
-  role: user.role,
-}
-const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
- 
-const token= await encrypt(session)
+  const store = await prisma.store.findUnique({
+    where: { sellerId: user.id }
+  })
 
-cookieStore.set('session', token, {
+  const session = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  }
+
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  const token = await encrypt(session)
+
+  cookieStore.set('session', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     expires: expiresAt,
@@ -96,22 +87,10 @@ cookieStore.set('session', token, {
     path: '/',
   })
 
-return Response.json({
-  message:"sucessfully submitted",
-  role:user.role,
-  email:user.email,
-  hasStore:!!store
-
-
-    })
+  return Response.json({
+    message: "Successfully logged in",
+    role: user.role,
+    email: user.email,
+    hasStore: !!store
+  })
 }
-
-    
-
-
-
-
-
-
-
-

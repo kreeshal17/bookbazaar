@@ -41,10 +41,13 @@ model User {
  created_at     DateTime @default(now())
 
   updated_at      DateTime @updatedAt 
+  isVerified   Boolean @default(false)
 
   store     Store?
   orders    Order[]
   cartItems CartItem[]
+  verificationTokens VerificationToken[]
+  passwordResetTokens PasswordResetToken[]
 
   @@map("users")
 }
@@ -184,4 +187,27 @@ model CartItem {
 
   @@unique([userId, bookId])
   @@map("cart_items")
+}
+
+
+
+model VerificationToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
 }

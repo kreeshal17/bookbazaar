@@ -495,10 +495,6 @@ export type StoreUncheckedUpdateOneWithoutSellerNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StoreUpdateToOneWithWhereWithoutSellerInput, Prisma.StoreUpdateWithoutSellerInput>, Prisma.StoreUncheckedUpdateWithoutSellerInput>
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type StoreCreateNestedOneWithoutBooksInput = {
   create?: Prisma.XOR<Prisma.StoreCreateWithoutBooksInput, Prisma.StoreUncheckedCreateWithoutBooksInput>
   connectOrCreate?: Prisma.StoreCreateOrConnectWithoutBooksInput
