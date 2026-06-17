@@ -71,6 +71,7 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busyStoreId, setBusyStoreId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     loadStores();
@@ -104,18 +105,18 @@ export default function AdminPage() {
   }
 
   async function approveSeller(storeId: string) {
-    setBusyStoreId(storeId)
+    setBusyStoreId(storeId);
     try {
-      await axios.patch(`/api/admin/approve-seller/${storeId}`)
-      setPendingSellers((current) => current.filter((s) => s.id !== storeId))
-      setMessage("Seller approved successfully. Approval email sent.")
-      loadStores()
+      await axios.patch(`/api/admin/approve-seller/${storeId}`);
+      setPendingSellers((current) => current.filter((s) => s.id !== storeId));
+      setMessage("Seller approved successfully. Approval email sent.");
+      loadStores();
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || "Unable to approve seller")
+        setError(err.response?.data?.message || "Unable to approve seller");
       }
     } finally {
-      setBusyStoreId(null)
+      setBusyStoreId(null);
     }
   }
 
@@ -131,6 +132,18 @@ export default function AdminPage() {
       { stores: 0, products: 0, orders: 0, revenue: 0 }
     );
   }, [stores]);
+
+  const filteredStores = useMemo(() => {
+    if (!searchQuery.trim()) return stores;
+    const q = searchQuery.toLowerCase();
+    return stores.filter(
+      (store) =>
+        store.name.toLowerCase().includes(q) ||
+        store.slug.toLowerCase().includes(q) ||
+        store.seller.full_name.toLowerCase().includes(q) ||
+        store.seller.email.toLowerCase().includes(q)
+    );
+  }, [stores, searchQuery]);
 
   async function toggleBan(store: AdminStore) {
     setBusyStoreId(store.id);
@@ -149,6 +162,29 @@ export default function AdminPage() {
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || "Unable to update seller");
+      }
+    } finally {
+      setBusyStoreId(null);
+    }
+  }
+
+  async function toggleVerify(store: AdminStore) {
+    setBusyStoreId(store.id);
+    setError("");
+    setMessage("");
+    try {
+      await axios.patch(`/api/admin/stores/${store.id}`, {
+        isVerified: !store.isVerified,
+      });
+      setStores((current) =>
+        current.map((item) =>
+          item.id === store.id ? { ...item, isVerified: !store.isVerified } : item
+        )
+      );
+      setMessage(store.isVerified ? "Verification removed." : "Seller verified.");
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Unable to update verification");
       }
     } finally {
       setBusyStoreId(null);
@@ -283,14 +319,30 @@ export default function AdminPage() {
         )}
 
         {/* ALL STORES */}
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
+          <h2 className="text-xl font-bold text-slate-900">All Stores</h2>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by store name, slug, seller or email..."
+            className="w-full max-w-sm rounded-xl border border-slate-200 px-4 py-2 text-sm focus:border-indigo-400 focus:outline-none"
+          />
+        </div>
+
         {stores.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center shadow-sm">
             <h2 className="text-2xl font-bold">No seller stores found</h2>
             <p className="mt-2 text-slate-500">Stores will appear here once sellers create them.</p>
           </div>
+        ) : filteredStores.length === 0 ? (
+          <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center shadow-sm">
+            <h2 className="text-2xl font-bold">No matching stores</h2>
+            <p className="mt-2 text-slate-500">Try a different search term.</p>
+          </div>
         ) : (
           <div className="mt-6 space-y-6">
-            {stores.map((store) => (
+            {filteredStores.map((store) => (
               <section
                 key={store.id}
                 className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
@@ -313,6 +365,13 @@ export default function AdminPage() {
                       }`}>
                         {store.isActive ? "ACTIVE" : "BANNED"}
                       </span>
+                      <span className={`rounded-full border px-3 py-1 text-xs font-bold ${
+                        store.isVerified
+                          ? "border-purple-200 bg-purple-50 text-purple-700"
+                          : "border-slate-200 bg-slate-50 text-slate-500"
+                      }`}>
+                        {store.isVerified ? "VERIFIED" : "UNVERIFIED"}
+                      </span>
                     </div>
 
                     <p className="mt-2 text-sm text-slate-500">
@@ -327,6 +386,19 @@ export default function AdminPage() {
                   </div>
 
                   <div className="flex flex-col gap-3 sm:flex-row">
+                    <button
+                      type="button"
+                      disabled={busyStoreId === store.id}
+                      onClick={() => toggleVerify(store)}
+                      className={`rounded-xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                        store.isVerified
+                          ? "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                          : "bg-purple-600 text-white hover:bg-purple-700"
+                      }`}
+                    >
+                      {store.isVerified ? "Remove Verification" : "Verify Seller"}
+                    </button>
+
                     <button
                       type="button"
                       disabled={busyStoreId === store.id}

@@ -3,9 +3,14 @@ import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { z } from "zod";
 
-const updateStoreSchema = z.object({
-  isActive: z.boolean(),
-});
+const updateStoreSchema = z
+  .object({
+    isActive: z.boolean().optional(),
+    isVerified: z.boolean().optional(),
+  })
+  .refine((data) => data.isActive !== undefined || data.isVerified !== undefined, {
+    message: "At least one field must be provided",
+  });
 
 async function requireAdmin() {
   const cookieStore = await cookies();
@@ -47,14 +52,19 @@ export async function PATCH(
       id: storeId,
     },
     data: {
-      isActive: result.data.isActive,
+      ...(result.data.isActive !== undefined && { isActive: result.data.isActive }),
+      ...(result.data.isVerified !== undefined && { isVerified: result.data.isVerified }),
     },
   });
 
-  return Response.json({
-    message: store.isActive ? "Seller unbanned" : "Seller banned",
-    store,
-  });
+  let message = "Store updated";
+  if (result.data.isActive !== undefined) {
+    message = store.isActive ? "Seller unbanned" : "Seller banned";
+  } else if (result.data.isVerified !== undefined) {
+    message = store.isVerified ? "Seller verified" : "Seller verification removed";
+  }
+
+  return Response.json({ message, store });
 }
 
 export async function DELETE(

@@ -161,10 +161,12 @@ export default async function Book({ params }: { params: Promise<{ id: string }>
                   <div className="h-16 w-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl">
                     🏪
                   </div>
-                  <div className="flex-grow">
-                    <h3 className="font-bold text-slate-900">{store?.name}</h3>
-                    <p className="text-sm text-slate-600">Verified Seller</p>
-                  </div>
+                 <div className="flex-grow">
+  <h3 className="font-bold text-slate-900">{store?.name}</h3>
+  <p className={`text-sm font-medium ${store?.isVerified ? "text-purple-600" : "text-slate-400"}`}>
+    {store?.isVerified ? "✓ Verified Seller" : "Unverified Seller"}
+  </p>
+</div>
                 </div>
               </div>
 

@@ -186,7 +186,7 @@ export default function Signup() {
             <div className="h-px flex-1 bg-slate-200" />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          {/* <div className="grid grid-cols-2 gap-3">
             <button className="rounded-xl border border-slate-300 py-3 font-medium text-slate-700 transition hover:bg-slate-100 hover:border-slate-400">
               Google
             </button>
@@ -194,7 +194,7 @@ export default function Signup() {
             <button className="rounded-xl border border-slate-300 py-3 font-medium text-slate-700 transition hover:bg-slate-100 hover:border-slate-400">
               GitHub
             </button>
-          </div>
+          </div> */}
 
           <p className="mt-6 text-center text-sm text-slate-500">
             Already have an account?{" "}
@@ -269,13 +269,13 @@ export default function Signup() {
             </h3>
 
             <p className="mt-1 text-sm text-slate-300">
-              Web Development, DSA and Software Engineering.
+              Web Development, DSA and Software Engineering Notes.
             </p>
           </div>
 
           <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
             <h3 className="text-lg font-semibold">
-              🤖 AI & ML Resources
+               AI & ML Resources
             </h3>
 
             <p className="mt-1 text-sm text-slate-300">

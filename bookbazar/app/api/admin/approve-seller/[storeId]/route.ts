@@ -4,7 +4,10 @@ import { cookies } from 'next/headers'
 import { decrypt } from '@/app/lib/session'
 import { resend } from '@/lib/resend/resend'
 
-export async function PATCH(req: NextRequest, { params }: { params: { storeId: string } }) {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ storeId: string }> }
+){
   const cookieStore = await cookies()
   const sessionCookie = cookieStore.get('session')?.value
   if (!sessionCookie) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
@@ -14,11 +17,20 @@ export async function PATCH(req: NextRequest, { params }: { params: { storeId: s
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 })
   }
 
-  const store = await prisma.store.update({
-    where: { id: params.storeId },
-    data: { isApproved: true, isActive: true },
-    include: { seller: true }
-  })
+ const { storeId } = await params;
+
+const store = await prisma.store.update({
+  where: {
+    id: storeId,
+  },
+  data: {
+    isApproved: true,
+    isActive: true,
+  },
+  include: {
+    seller: true,
+  },
+});
 
   await resend.emails.send({
     from: 'BookMandu <noreply@krishalkarna.com.np>',

@@ -99,6 +99,7 @@ export async function GET() {
       slug: store.slug,
       description: store.description,
       isActive: store.isActive,
+      isApproved: store.isApproved, 
       isVerified: store.isVerified,
       createdAt: store.createdAt,
       seller: store.seller,
