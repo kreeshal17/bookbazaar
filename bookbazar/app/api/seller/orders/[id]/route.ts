@@ -22,9 +22,7 @@ async function getSellerStore() {
   }
 
   const store = await prisma.store.findUnique({
-    where: {
-      sellerId: payload.id as string,
-    },
+    where: { sellerId: payload.id as string },
   });
 
   if (!store) {
@@ -47,33 +45,33 @@ export async function PATCH(
   }
 
   const { store, error } = await getSellerStore();
-
-  if (error) {
-    return error;
-  }
+  if (error) return error;
 
   const order = await prisma.order.findFirst({
     where: {
       id,
-      items: {
-        some: {
-          storeId: store.id,
-        },
-      },
+      items: { some: { storeId: store!.id } },
     },
+    include: { items: true }
   });
 
   if (!order) {
     return Response.json({ message: "Order not found" }, { status: 404 });
   }
 
+  // if cancelling — increase stock back
+  if (result.data.status === "CANCELLED" && order.status !== "CANCELLED") {
+    for (const item of order.items) {
+      await prisma.book.update({
+        where: { id: item.bookId },
+        data: { stockQty: { increment: item.quantity } }
+      })
+    }
+  }
+
   const updatedOrder = await prisma.order.update({
-    where: {
-      id,
-    },
-    data: {
-      status: result.data.status,
-    },
+    where: { id },
+    data: { status: result.data.status },
   });
 
   return Response.json({

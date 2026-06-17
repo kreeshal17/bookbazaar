@@ -10,6 +10,7 @@ export default function Signup() {
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [role, setRole] = useState('')
@@ -32,6 +33,12 @@ export default function Signup() {
     if (!email.trim()) {
       setIsError(true)
       setMessage('Please enter your email')
+      return
+    }
+
+    if (!/^\+?[0-9\s-]{7,15}$/.test(phone.trim())) {
+      setIsError(true)
+      setMessage('Please enter a valid phone number')
       return
     }
 
@@ -59,6 +66,7 @@ export default function Signup() {
       const response = await axios.post('/api/auth/signup', {
         name,
         email,
+        phone,
         password,
         role,
       })
@@ -114,6 +122,14 @@ export default function Signup() {
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-xl border border-slate-300 p-3 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+            />
+
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="w-full rounded-xl border border-slate-300 p-3 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
             />
 

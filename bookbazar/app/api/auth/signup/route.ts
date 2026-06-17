@@ -43,6 +43,7 @@ export async function POST(req: Request) {
       data: {
         full_name: data.name,
         email: data.email,
+        phone: data.phone,
         password_hash: hashedPassword,
         role: data.role,
       },

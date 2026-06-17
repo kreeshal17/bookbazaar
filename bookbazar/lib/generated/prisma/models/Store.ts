@@ -34,6 +34,9 @@ export type StoreMinAggregateOutputType = {
   bannerUrl: string | null
   isVerified: boolean | null
   isActive: boolean | null
+  phone: string | null
+  identityUrl: string | null
+  isApproved: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -48,6 +51,9 @@ export type StoreMaxAggregateOutputType = {
   bannerUrl: string | null
   isVerified: boolean | null
   isActive: boolean | null
+  phone: string | null
+  identityUrl: string | null
+  isApproved: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,6 +68,9 @@ export type StoreCountAggregateOutputType = {
   bannerUrl: number
   isVerified: number
   isActive: number
+  phone: number
+  identityUrl: number
+  isApproved: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -78,6 +87,9 @@ export type StoreMinAggregateInputType = {
   bannerUrl?: true
   isVerified?: true
   isActive?: true
+  phone?: true
+  identityUrl?: true
+  isApproved?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -92,6 +104,9 @@ export type StoreMaxAggregateInputType = {
   bannerUrl?: true
   isVerified?: true
   isActive?: true
+  phone?: true
+  identityUrl?: true
+  isApproved?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +121,9 @@ export type StoreCountAggregateInputType = {
   bannerUrl?: true
   isVerified?: true
   isActive?: true
+  phone?: true
+  identityUrl?: true
+  isApproved?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -193,6 +211,9 @@ export type StoreGroupByOutputType = {
   bannerUrl: string | null
   isVerified: boolean
   isActive: boolean
+  phone: string | null
+  identityUrl: string | null
+  isApproved: boolean
   createdAt: Date
   updatedAt: Date
   _count: StoreCountAggregateOutputType | null
@@ -228,6 +249,9 @@ export type StoreWhereInput = {
   bannerUrl?: Prisma.StringNullableFilter<"Store"> | string | null
   isVerified?: Prisma.BoolFilter<"Store"> | boolean
   isActive?: Prisma.BoolFilter<"Store"> | boolean
+  phone?: Prisma.StringNullableFilter<"Store"> | string | null
+  identityUrl?: Prisma.StringNullableFilter<"Store"> | string | null
+  isApproved?: Prisma.BoolFilter<"Store"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Store"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Store"> | Date | string
   seller?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -245,6 +269,9 @@ export type StoreOrderByWithRelationInput = {
   bannerUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  identityUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  isApproved?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   seller?: Prisma.UserOrderByWithRelationInput
@@ -265,6 +292,9 @@ export type StoreWhereUniqueInput = Prisma.AtLeast<{
   bannerUrl?: Prisma.StringNullableFilter<"Store"> | string | null
   isVerified?: Prisma.BoolFilter<"Store"> | boolean
   isActive?: Prisma.BoolFilter<"Store"> | boolean
+  phone?: Prisma.StringNullableFilter<"Store"> | string | null
+  identityUrl?: Prisma.StringNullableFilter<"Store"> | string | null
+  isApproved?: Prisma.BoolFilter<"Store"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Store"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Store"> | Date | string
   seller?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -282,6 +312,9 @@ export type StoreOrderByWithAggregationInput = {
   bannerUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  identityUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  isApproved?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.StoreCountOrderByAggregateInput
@@ -302,6 +335,9 @@ export type StoreScalarWhereWithAggregatesInput = {
   bannerUrl?: Prisma.StringNullableWithAggregatesFilter<"Store"> | string | null
   isVerified?: Prisma.BoolWithAggregatesFilter<"Store"> | boolean
   isActive?: Prisma.BoolWithAggregatesFilter<"Store"> | boolean
+  phone?: Prisma.StringNullableWithAggregatesFilter<"Store"> | string | null
+  identityUrl?: Prisma.StringNullableWithAggregatesFilter<"Store"> | string | null
+  isApproved?: Prisma.BoolWithAggregatesFilter<"Store"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Store"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Store"> | Date | string
 }
@@ -315,6 +351,9 @@ export type StoreCreateInput = {
   bannerUrl?: string | null
   isVerified?: boolean
   isActive?: boolean
+  phone?: string | null
+  identityUrl?: string | null
+  isApproved?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   seller: Prisma.UserCreateNestedOneWithoutStoreInput
@@ -332,6 +371,9 @@ export type StoreUncheckedCreateInput = {
   bannerUrl?: string | null
   isVerified?: boolean
   isActive?: boolean
+  phone?: string | null
+  identityUrl?: string | null
+  isApproved?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookUncheckedCreateNestedManyWithoutStoreInput
@@ -347,6 +389,9 @@ export type StoreUpdateInput = {
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   seller?: Prisma.UserUpdateOneRequiredWithoutStoreNestedInput
@@ -364,6 +409,9 @@ export type StoreUncheckedUpdateInput = {
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUncheckedUpdateManyWithoutStoreNestedInput
@@ -380,6 +428,9 @@ export type StoreCreateManyInput = {
   bannerUrl?: string | null
   isVerified?: boolean
   isActive?: boolean
+  phone?: string | null
+  identityUrl?: string | null
+  isApproved?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -393,6 +444,9 @@ export type StoreUpdateManyMutationInput = {
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -407,6 +461,9 @@ export type StoreUncheckedUpdateManyInput = {
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -426,6 +483,9 @@ export type StoreCountOrderByAggregateInput = {
   bannerUrl?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
+  identityUrl?: Prisma.SortOrder
+  isApproved?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -440,6 +500,9 @@ export type StoreMaxOrderByAggregateInput = {
   bannerUrl?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
+  identityUrl?: Prisma.SortOrder
+  isApproved?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -454,6 +517,9 @@ export type StoreMinOrderByAggregateInput = {
   bannerUrl?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
+  identityUrl?: Prisma.SortOrder
+  isApproved?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -532,6 +598,9 @@ export type StoreCreateWithoutSellerInput = {
   bannerUrl?: string | null
   isVerified?: boolean
   isActive?: boolean
+  phone?: string | null
+  identityUrl?: string | null
+  isApproved?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookCreateNestedManyWithoutStoreInput
@@ -547,6 +616,9 @@ export type StoreUncheckedCreateWithoutSellerInput = {
   bannerUrl?: string | null
   isVerified?: boolean
   isActive?: boolean
+  phone?: string | null
+  identityUrl?: string | null
+  isApproved?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookUncheckedCreateNestedManyWithoutStoreInput
@@ -578,6 +650,9 @@ export type StoreUpdateWithoutSellerInput = {
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUpdateManyWithoutStoreNestedInput
@@ -593,6 +668,9 @@ export type StoreUncheckedUpdateWithoutSellerInput = {
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUncheckedUpdateManyWithoutStoreNestedInput
@@ -608,6 +686,9 @@ export type StoreCreateWithoutBooksInput = {
   bannerUrl?: string | null
   isVerified?: boolean
   isActive?: boolean
+  phone?: string | null
+  identityUrl?: string | null
+  isApproved?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   seller: Prisma.UserCreateNestedOneWithoutStoreInput
@@ -624,6 +705,9 @@ export type StoreUncheckedCreateWithoutBooksInput = {
   bannerUrl?: string | null
   isVerified?: boolean
   isActive?: boolean
+  phone?: string | null
+  identityUrl?: string | null
+  isApproved?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutStoreInput
@@ -654,6 +738,9 @@ export type StoreUpdateWithoutBooksInput = {
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   seller?: Prisma.UserUpdateOneRequiredWithoutStoreNestedInput
@@ -670,6 +757,9 @@ export type StoreUncheckedUpdateWithoutBooksInput = {
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutStoreNestedInput
@@ -684,6 +774,9 @@ export type StoreCreateWithoutOrderItemsInput = {
   bannerUrl?: string | null
   isVerified?: boolean
   isActive?: boolean
+  phone?: string | null
+  identityUrl?: string | null
+  isApproved?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   seller: Prisma.UserCreateNestedOneWithoutStoreInput
@@ -700,6 +793,9 @@ export type StoreUncheckedCreateWithoutOrderItemsInput = {
   bannerUrl?: string | null
   isVerified?: boolean
   isActive?: boolean
+  phone?: string | null
+  identityUrl?: string | null
+  isApproved?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   books?: Prisma.BookUncheckedCreateNestedManyWithoutStoreInput
@@ -730,6 +826,9 @@ export type StoreUpdateWithoutOrderItemsInput = {
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   seller?: Prisma.UserUpdateOneRequiredWithoutStoreNestedInput
@@ -746,6 +845,9 @@ export type StoreUncheckedUpdateWithoutOrderItemsInput = {
   bannerUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  identityUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   books?: Prisma.BookUncheckedUpdateManyWithoutStoreNestedInput
@@ -801,6 +903,9 @@ export type StoreSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   bannerUrl?: boolean
   isVerified?: boolean
   isActive?: boolean
+  phone?: boolean
+  identityUrl?: boolean
+  isApproved?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -819,6 +924,9 @@ export type StoreSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   bannerUrl?: boolean
   isVerified?: boolean
   isActive?: boolean
+  phone?: boolean
+  identityUrl?: boolean
+  isApproved?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -834,6 +942,9 @@ export type StoreSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   bannerUrl?: boolean
   isVerified?: boolean
   isActive?: boolean
+  phone?: boolean
+  identityUrl?: boolean
+  isApproved?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -849,11 +960,14 @@ export type StoreSelectScalar = {
   bannerUrl?: boolean
   isVerified?: boolean
   isActive?: boolean
+  phone?: boolean
+  identityUrl?: boolean
+  isApproved?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type StoreOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerId" | "name" | "slug" | "description" | "logoUrl" | "bannerUrl" | "isVerified" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["store"]>
+export type StoreOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerId" | "name" | "slug" | "description" | "logoUrl" | "bannerUrl" | "isVerified" | "isActive" | "phone" | "identityUrl" | "isApproved" | "createdAt" | "updatedAt", ExtArgs["result"]["store"]>
 export type StoreInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   books?: boolean | Prisma.Store$booksArgs<ExtArgs>
@@ -884,6 +998,9 @@ export type $StorePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     bannerUrl: string | null
     isVerified: boolean
     isActive: boolean
+    phone: string | null
+    identityUrl: string | null
+    isApproved: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["store"]>
@@ -1321,6 +1438,9 @@ export interface StoreFieldRefs {
   readonly bannerUrl: Prisma.FieldRef<"Store", 'String'>
   readonly isVerified: Prisma.FieldRef<"Store", 'Boolean'>
   readonly isActive: Prisma.FieldRef<"Store", 'Boolean'>
+  readonly phone: Prisma.FieldRef<"Store", 'String'>
+  readonly identityUrl: Prisma.FieldRef<"Store", 'String'>
+  readonly isApproved: Prisma.FieldRef<"Store", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Store", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Store", 'DateTime'>
 }

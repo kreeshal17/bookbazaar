@@ -12,13 +12,23 @@ async function getUserId() {
   const session = cookieStore.get("session")?.value;
 
   if (!session) {
-    return { error: Response.json({ message: "Unauthorized" }, { status: 401 }) };
+    return {
+      error: Response.json(
+        { message: "Unauthorized" },
+        { status: 401 }
+      ),
+    };
   }
 
   const payload = await decrypt(session);
 
   if (!payload) {
-    return { error: Response.json({ message: "Invalid session" }, { status: 401 }) };
+    return {
+      error: Response.json(
+        { message: "Invalid session" },
+        { status: 401 }
+      ),
+    };
   }
 
   return { userId: payload.id as string };
@@ -35,11 +45,16 @@ export async function PATCH(
   }
 
   const { id } = await context.params;
+
   const body = await req.json();
+
   const result = cartActionSchema.safeParse(body);
 
   if (!result.success) {
-    return Response.json({ message: "Invalid cart action" }, { status: 400 });
+    return Response.json(
+      { message: "Invalid cart action" },
+      { status: 400 }
+    );
   }
 
   const cartItem = await prisma.cartItem.findFirst({
@@ -47,20 +62,46 @@ export async function PATCH(
       id,
       userId,
     },
+    include: {
+      book: true,
+    },
   });
 
   if (!cartItem) {
-    return Response.json({ message: "Cart item not found" }, { status: 404 });
+    return Response.json(
+      { message: "Cart item not found" },
+      { status: 404 }
+    );
   }
 
-  if (result.data.action === "decrement" && cartItem.quantity <= 1) {
+  if (
+    result.data.action === "increment" &&
+    cartItem.quantity >= cartItem.book.stockQty
+  ) {
+    return Response.json(
+      {
+        message: "No more stock available",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  if (
+    result.data.action === "decrement" &&
+    cartItem.quantity <= 1
+  ) {
     await prisma.cartItem.delete({
       where: {
         id,
       },
     });
 
-    return Response.json({ message: "Cart item removed", cartItem: null });
+    return Response.json({
+      message: "Cart item removed",
+      cartItem: null,
+    });
   }
 
   const updatedCartItem = await prisma.cartItem.update({
@@ -94,6 +135,7 @@ export async function DELETE(
   }
 
   const { id } = await context.params;
+
   const cartItem = await prisma.cartItem.findFirst({
     where: {
       id,
@@ -102,7 +144,10 @@ export async function DELETE(
   });
 
   if (!cartItem) {
-    return Response.json({ message: "Cart item not found" }, { status: 404 });
+    return Response.json(
+      { message: "Cart item not found" },
+      { status: 404 }
+    );
   }
 
   await prisma.cartItem.delete({
@@ -111,5 +156,7 @@ export async function DELETE(
     },
   });
 
-  return Response.json({ message: "Cart item removed" });
+  return Response.json({
+    message: "Cart item removed",
+  });
 }

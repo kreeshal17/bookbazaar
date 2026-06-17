@@ -27,3 +27,14 @@ export const OrderStatus = {
 } as const
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
+export const BookCondition = {
+  NEW: 'NEW',
+  LIKE_NEW: 'LIKE_NEW',
+  GOOD: 'GOOD',
+  ACCEPTABLE: 'ACCEPTABLE',
+  OLD: 'OLD'
+} as const
+
+export type BookCondition = (typeof BookCondition)[keyof typeof BookCondition]

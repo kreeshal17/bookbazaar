@@ -1,6 +1,5 @@
 import { decrypt } from "@/app/lib/session";
 import prisma from "@/lib/prisma";
-import { error } from "console";
 import { cookies } from "next/headers";
 import {z} from "zod"
 
@@ -43,11 +42,13 @@ async function getCategoryId(categoryId?: string) {
  const addBookSchema = z.object({
   title: z
     .string()
-    .min(3, "Title must be at least 3 characters"),
+    .min(1, "Title is required")
+    .max(100, "Title must be 100 characters or less"),
 
   description: z
     .string()
-    .optional(),
+    .min(20, "Description must be at least 20 characters")
+    .max(1000, "Description must be 1000 characters or less"),
 
   author: z
     .string()
@@ -126,6 +127,12 @@ if (!store) {
   return Response.json(
     { message: "Store not found" },
     { status: 404 }
+  )
+}
+if (!store.isApproved || !store.isActive) {
+  return Response.json(
+    { message: "Your store must be approved by admin before listing books" },
+    { status: 403 }
   )
 }
 const book=await prisma.book.create({

@@ -6,16 +6,23 @@ import Link from 'next/link'
 export default function ForgotPassword() {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: any) {
     e.preventDefault()
     setLoading(true)
+    setMessage('')
+    setError('')
     try {
       const res = await axios.post('/api/auth/forgot-password', { email })
       setMessage(res.data.message)
-    } catch {
-      setMessage('Something went wrong. Try again.')
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.error || 'Something went wrong. Try again.')
+      } else {
+        setError('Something went wrong. Try again.')
+      }
     } finally {
       setLoading(false)
     }
@@ -31,9 +38,6 @@ export default function ForgotPassword() {
           </div>
 
           <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
-            {message ? (
-              <p className="text-green-600 text-center font-medium">{message}</p>
-            ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">Email Address</label>
@@ -54,6 +58,17 @@ export default function ForgotPassword() {
                   {loading ? 'Sending...' : 'Send Reset Link'}
                 </button>
               </form>
+
+            {error && (
+              <p className="mt-4 text-center text-sm font-medium text-red-600">
+                {error}
+              </p>
+            )}
+
+            {message && (
+              <p className="mt-4 text-center text-sm font-medium text-green-600">
+                {message}
+              </p>
             )}
 
             <p className="mt-6 text-center text-sm text-slate-500">

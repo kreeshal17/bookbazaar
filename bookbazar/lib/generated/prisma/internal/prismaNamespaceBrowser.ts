@@ -59,7 +59,8 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   CartItem: 'CartItem',
   VerificationToken: 'VerificationToken',
-  PasswordResetToken: 'PasswordResetToken'
+  PasswordResetToken: 'PasswordResetToken',
+  Review: 'Review'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -87,7 +88,8 @@ export const UserScalarFieldEnum = {
   role: 'role',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  isVerified: 'isVerified'
+  isVerified: 'isVerified',
+  phone: 'phone'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -103,6 +105,9 @@ export const StoreScalarFieldEnum = {
   bannerUrl: 'bannerUrl',
   isVerified: 'isVerified',
   isActive: 'isActive',
+  phone: 'phone',
+  identityUrl: 'identityUrl',
+  isApproved: 'isApproved',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -128,8 +133,10 @@ export const BookScalarFieldEnum = {
   author: 'author',
   isbn: 'isbn',
   price: 'price',
+  originalPrice: 'originalPrice',
   stockQty: 'stockQty',
   imageUrl: 'imageUrl',
+  condition: 'condition',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -199,6 +206,18 @@ export const PasswordResetTokenScalarFieldEnum = {
 } as const
 
 export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
+
+
+export const ReviewScalarFieldEnum = {
+  id: 'id',
+  bookId: 'bookId',
+  userId: 'userId',
+  rating: 'rating',
+  comment: 'comment',
+  createdAt: 'createdAt'
+} as const
+
+export type ReviewScalarFieldEnum = (typeof ReviewScalarFieldEnum)[keyof typeof ReviewScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -11,9 +11,11 @@ interface BookForm {
   isbn: string;
   categoryId: string;
   price: string;
+  originalPrice: string;
   stockQty: string;
   description: string;
   imageUrl: string | null;
+  condition: string;
 }
 
 interface Book {
@@ -24,8 +26,18 @@ interface Book {
   author: string | null;
   isbn: string | null;
   price: number | string;
+  originalPrice: number | string | null;
   stockQty: number;
   imageUrl: string | null;
+  condition: string;
+}
+
+interface FormErrors {
+  title?: string;
+  description?: string;
+  price?: string;
+  originalPrice?: string;
+  stockQty?: string;
 }
 
 const emptyForm: BookForm = {
@@ -34,9 +46,11 @@ const emptyForm: BookForm = {
   isbn: "",
   categoryId: "",
   price: "",
+  originalPrice: "",
   stockQty: "",
   description: "",
   imageUrl: "",
+  condition: "NEW",
 };
 
 const categories = [
@@ -49,6 +63,22 @@ const categories = [
   { value: "others", label: "Others" },
 ];
 
+const conditions = [
+  { value: "NEW", label: "New" },
+  { value: "LIKE_NEW", label: "Like New" },
+  { value: "GOOD", label: "Good" },
+  { value: "ACCEPTABLE", label: "Acceptable" },
+  { value: "OLD", label: "Old" },
+];
+
+const conditionColors: Record<string, string> = {
+  NEW: "bg-green-100 text-green-700",
+  LIKE_NEW: "bg-emerald-100 text-emerald-700",
+  GOOD: "bg-blue-100 text-blue-700",
+  ACCEPTABLE: "bg-yellow-100 text-yellow-700",
+  OLD: "bg-red-100 text-red-700",
+}
+
 export default function AddBookPage() {
   const [form, setForm] = useState<BookForm>(emptyForm);
   const [editBookId, setEditBookId] = useState<string | null>(null);
@@ -57,6 +87,7 @@ export default function AddBookPage() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -82,8 +113,10 @@ export default function AddBookPage() {
           isbn: book.isbn || "",
           categoryId: book.categoryId || "",
           price: String(book.price || ""),
+          originalPrice: String(book.originalPrice || ""),
           stockQty: String(book.stockQty || ""),
           description: book.description || "",
+          condition: book.condition || "NEW",
         });
         if (book.imageUrl) setPreview(book.imageUrl);
       } catch (err) {
@@ -101,12 +134,14 @@ export default function AddBookPage() {
 
   function updateField(field: keyof BookForm, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
+    setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
   function resetForm() {
     setForm(emptyForm);
     setMessage("");
     setError("");
+    setErrors({});
     setFile(null);
     setPreview(null);
   }
@@ -114,13 +149,54 @@ export default function AddBookPage() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0] || null;
     setFile(selected);
-    if (selected) {
-      setPreview(URL.createObjectURL(selected));
+    if (selected) setPreview(URL.createObjectURL(selected));
+  }
+
+  function validate(): boolean {
+    const newErrors: FormErrors = {}
+
+    if (!form.title.trim()) {
+      newErrors.title = "Title is required"
+    } else if (form.title.length > 100) {
+      newErrors.title = "Title must be less than 100 characters"
     }
+
+    if (!form.description.trim()) {
+      newErrors.description = "Description is required"
+    } else if (form.description.length < 20) {
+      newErrors.description = "Description must be at least 20 characters"
+    } else if (form.description.length > 1000) {
+      newErrors.description = "Description must be less than 1000 characters"
+    }
+
+    if (!form.price) {
+      newErrors.price = "Price is required"
+    } else if (Number(form.price) <= 0) {
+      newErrors.price = "Price must be greater than 0"
+    }
+
+    if (form.originalPrice && Number(form.originalPrice) <= 0) {
+      newErrors.originalPrice = "Original price must be greater than 0"
+    }
+
+    if (form.originalPrice && Number(form.originalPrice) <= Number(form.price)) {
+      newErrors.originalPrice = "Original price must be greater than selling price"
+    }
+
+    if (!form.stockQty) {
+      newErrors.stockQty = "Stock quantity is required"
+    } else if (Number(form.stockQty) < 0) {
+      newErrors.stockQty = "Stock quantity cannot be negative"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!validate()) return;
+
     setSaving(true);
     setMessage("");
     setError("");
@@ -145,8 +221,10 @@ export default function AddBookPage() {
         isbn: form.isbn,
         categoryId: form.categoryId,
         price: Number(form.price),
+        originalPrice: form.originalPrice ? Number(form.originalPrice) : null,
         stockQty: Number(form.stockQty),
         description: form.description,
+        condition: form.condition,
         imageUrl,
       };
 
@@ -164,8 +242,8 @@ export default function AddBookPage() {
       if (axios.isAxiosError(err)) {
         setError(
           err.response?.data?.message ||
-            err.response?.data?.errors?.issues?.[0]?.message ||
-            "Something went wrong."
+          err.response?.data?.errors?.issues?.[0]?.message ||
+          "Something went wrong."
         );
       } else {
         setError("Something went wrong.");
@@ -176,10 +254,13 @@ export default function AddBookPage() {
     }
   }
 
+  const discount = form.originalPrice && form.price && Number(form.originalPrice) > Number(form.price)
+    ? Math.round(((Number(form.originalPrice) - Number(form.price)) / Number(form.originalPrice)) * 100)
+    : null
+
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="mx-auto max-w-6xl">
-        {/* Header */}
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="mb-1 text-sm font-semibold uppercase tracking-widest text-indigo-600">
@@ -189,9 +270,7 @@ export default function AddBookPage() {
               {isEditing ? "Edit Book" : "Add New Book"}
             </h1>
             <p className="mt-1 text-slate-500">
-              {isEditing
-                ? "Update the details for this store item."
-                : "Add a new book to your store inventory."}
+              {isEditing ? "Update the details for this store item." : "Add a new book to your store inventory."}
             </p>
           </div>
           <Link
@@ -209,8 +288,8 @@ export default function AddBookPage() {
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-              {/* Left - Form */}
               <div className="space-y-6 lg:col-span-2">
+
                 {message && (
                   <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
                     ✓ {message}
@@ -224,9 +303,7 @@ export default function AddBookPage() {
 
                 {/* Basic Info */}
                 <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">
-                    Basic Info
-                  </h2>
+                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">Basic Info</h2>
                   <div className="space-y-4">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
@@ -237,62 +314,98 @@ export default function AddBookPage() {
                         value={form.title}
                         onChange={(e) => updateField("title", e.target.value)}
                         placeholder="Enter book title"
-                        required
-                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                        className={`w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:bg-white focus:ring-4 focus:ring-indigo-50 ${errors.title ? "border-red-400 focus:border-red-400" : "border-slate-200 focus:border-indigo-500"}`}
                       />
+                      {errors.title && <p className="mt-1 text-xs text-red-600">{errors.title}</p>}
                     </div>
+
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Author
-                      </label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">Author</label>
                       <input
                         type="text"
-                        value={form.author ?? ""}
+                        value={form.author}
                         onChange={(e) => updateField("author", e.target.value)}
                         placeholder="Enter author name"
                         className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
                       />
                     </div>
+
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">
-                        ISBN
-                      </label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">ISBN</label>
                       <input
                         type="text"
-                        value={form.isbn ?? ""}
+                        value={form.isbn}
                         onChange={(e) => updateField("isbn", e.target.value)}
                         placeholder="Enter ISBN number"
                         className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
                       />
+                    </div>
+
+                    {/* Condition */}
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Book Condition <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {conditions.map((c) => (
+                          <button
+                            key={c.value}
+                            type="button"
+                            onClick={() => updateField("condition", c.value)}
+                            className={`rounded-full px-4 py-2 text-xs font-semibold transition border ${
+                              form.condition === c.value
+                                ? conditionColors[c.value] + " border-transparent"
+                                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                            }`}
+                          >
+                            {c.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Pricing & Stock */}
                 <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">
-                    Pricing & Stock
-                  </h2>
+                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">Pricing & Stock</h2>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Price (NPR) <span className="text-red-500">*</span>
+                        Selling Price (NPR) <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">
-                          Rs.
-                        </span>
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">Rs.</span>
                         <input
                           type="number"
                           value={form.price}
                           onChange={(e) => updateField("price", e.target.value)}
                           placeholder="299"
                           min="1"
-                          required
-                          className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                          className={`w-full rounded-xl border bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition focus:bg-white focus:ring-4 focus:ring-indigo-50 ${errors.price ? "border-red-400" : "border-slate-200 focus:border-indigo-500"}`}
                         />
                       </div>
+                      {errors.price && <p className="mt-1 text-xs text-red-600">{errors.price}</p>}
                     </div>
+
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Original Price (NPR) <span className="text-slate-400 text-xs font-normal">for discount badge</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">Rs.</span>
+                        <input
+                          type="number"
+                          value={form.originalPrice}
+                          onChange={(e) => updateField("originalPrice", e.target.value)}
+                          placeholder="499"
+                          min="1"
+                          className={`w-full rounded-xl border bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition focus:bg-white focus:ring-4 focus:ring-indigo-50 ${errors.originalPrice ? "border-red-400" : "border-slate-200 focus:border-indigo-500"}`}
+                        />
+                      </div>
+                      {errors.originalPrice && <p className="mt-1 text-xs text-red-600">{errors.originalPrice}</p>}
+                    </div>
+
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
                         Stock Quantity <span className="text-red-500">*</span>
@@ -303,23 +416,19 @@ export default function AddBookPage() {
                         onChange={(e) => updateField("stockQty", e.target.value)}
                         placeholder="10"
                         min="0"
-                        required
-                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                        className={`w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:bg-white focus:ring-4 focus:ring-indigo-50 ${errors.stockQty ? "border-red-400" : "border-slate-200 focus:border-indigo-500"}`}
                       />
+                      {errors.stockQty && <p className="mt-1 text-xs text-red-600">{errors.stockQty}</p>}
                     </div>
                   </div>
                 </div>
 
-                {/* Category & Description */}
+                {/* Details */}
                 <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">
-                    Details
-                  </h2>
+                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">Details</h2>
                   <div className="space-y-4">
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Category
-                      </label>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">Category</label>
                       <select
                         value={form.categoryId}
                         onChange={(e) => updateField("categoryId", e.target.value)}
@@ -327,54 +436,42 @@ export default function AddBookPage() {
                       >
                         <option value="">Select Category</option>
                         {categories.map((category) => (
-                          <option key={category.value} value={category.value}>
-                            {category.label}
-                          </option>
+                          <option key={category.value} value={category.value}>{category.label}</option>
                         ))}
                       </select>
                     </div>
+
                     <div>
                       <label className="mb-2 block text-sm font-medium text-slate-700">
-                        Description
+                        Description <span className="text-red-500">*</span>
+                        <span className="ml-2 text-xs font-normal text-slate-400">
+                          {form.description.length}/1000
+                        </span>
                       </label>
                       <textarea
                         value={form.description}
                         onChange={(e) => updateField("description", e.target.value)}
                         rows={5}
-                        placeholder="Write book description..."
-                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                        placeholder="Write book description (min 20 characters)..."
+                        className={`w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:bg-white focus:ring-4 focus:ring-indigo-50 ${errors.description ? "border-red-400" : "border-slate-200 focus:border-indigo-500"}`}
                       />
+                      {errors.description && <p className="mt-1 text-xs text-red-600">{errors.description}</p>}
                     </div>
                   </div>
                 </div>
 
                 {/* Image Upload */}
                 <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">
-                    Book Cover
-                  </h2>
+                  <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">Book Cover</h2>
                   <label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 p-8 transition hover:border-indigo-300 hover:bg-indigo-50">
                     <span className="text-3xl">📷</span>
                     <div className="text-center">
-                      <p className="text-sm font-medium text-slate-700">
-                        Click to upload image
-                      </p>
-                      <p className="mt-1 text-xs text-slate-400">
-                        PNG, JPG, WEBP up to 10MB
-                      </p>
+                      <p className="text-sm font-medium text-slate-700">Click to upload image</p>
+                      <p className="mt-1 text-xs text-slate-400">PNG, JPG, WEBP up to 10MB</p>
                     </div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
+                    <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
                   </label>
-                  {file && (
-                    <p className="mt-3 text-center text-xs text-slate-500">
-                      ✓ Selected: {file.name}
-                    </p>
-                  )}
+                  {file && <p className="mt-3 text-center text-xs text-slate-500">✓ Selected: {file.name}</p>}
                 </div>
 
                 {/* Actions */}
@@ -393,51 +490,47 @@ export default function AddBookPage() {
                     disabled={saving}
                     className="rounded-xl bg-indigo-600 px-10 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
                   >
-                    {uploading
-                      ? "Uploading image..."
-                      : saving
-                        ? "Saving..."
-                        : isEditing
-                          ? "Update Book"
-                          : "Add Book"}
+                    {uploading ? "Uploading image..." : saving ? "Saving..." : isEditing ? "Update Book" : "Add Book"}
                   </button>
                 </div>
               </div>
 
-              {/* Right - Preview */}
+              {/* Right Preview */}
               <div className="lg:col-span-1">
                 <div className="sticky top-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">
-                    Live Preview
-                  </p>
+                  <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-slate-400">Live Preview</p>
 
                   <div className="relative mb-4 flex aspect-[3/4] items-center justify-center overflow-hidden rounded-xl bg-slate-100">
                     {preview ? (
-                      <Image
-                        src={preview}
-                        alt="Book cover preview"
-                        fill
-                        className="object-cover"
-                      />
+                      <Image src={preview} alt="Book cover preview" fill className="object-cover" />
                     ) : (
                       <span className="text-6xl">📚</span>
                     )}
                   </div>
 
-                  <h2 className="text-lg font-bold text-slate-900">
-                    {form.title || "Book Title"}
-                  </h2>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {form.author || "Author Name"}
-                  </p>
+                  <h2 className="text-lg font-bold text-slate-900">{form.title || "Book Title"}</h2>
+                  <p className="mt-1 text-sm text-slate-500">{form.author || "Author Name"}</p>
 
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
-                      Rs. {form.price || "0"}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-bold text-indigo-600">Rs. {form.price || "0"}</span>
+                      {form.originalPrice && Number(form.originalPrice) > Number(form.price) && (
+                        <span className="text-sm text-slate-400 line-through">Rs. {form.originalPrice}</span>
+                      )}
+                    </div>
+                    {discount && (
+                      <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-600">
+                        {discount}% OFF
+                      </span>
+                    )}
                     <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
                       Stock: {form.stockQty || "0"}
                     </span>
+                    {form.condition && (
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${conditionColors[form.condition]}`}>
+                        {conditions.find(c => c.value === form.condition)?.label}
+                      </span>
+                    )}
                     {form.categoryId && (
                       <span className="rounded-full bg-indigo-100 px-3 py-1 text-xs font-medium text-indigo-700">
                         {categories.find((c) => c.value === form.categoryId)?.label}
@@ -446,9 +539,7 @@ export default function AddBookPage() {
                   </div>
 
                   {form.description && (
-                    <p className="mt-4 line-clamp-4 text-xs leading-relaxed text-slate-500">
-                      {form.description}
-                    </p>
+                    <p className="mt-4 line-clamp-4 text-xs leading-relaxed text-slate-500">{form.description}</p>
                   )}
                 </div>
               </div>

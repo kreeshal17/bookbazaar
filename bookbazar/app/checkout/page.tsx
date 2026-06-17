@@ -25,21 +25,65 @@ export default function checkout() {
   const router = useRouter()
   const [paymentMethod, setPaymentMethod] = useState("COD")
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault()
-    const response = await axios.post("/api/order/create", {
-      fullName,
-      phone,
-      shippingAddr: address,
-      city,
-      state,
-      postalCode
-    })
-    if (response.data) {
-      alert("sucessfully submitted")
-      router.push("/orders")
+ const handleSubmit = async (e: any) => {
+  e.preventDefault();
+
+  if (!fullName.trim()) {
+    alert("Please enter your full name");
+    return;
+  }
+
+  if (!phone.trim()) {
+    alert("Please enter your phone number");
+    return;
+  }
+
+  if (!address.trim()) {
+    alert("Please enter your address");
+    return;
+  }
+
+  if (!city.trim()) {
+    alert("Please enter your city");
+    return;
+  }
+
+  if (!state.trim()) {
+    alert("Please enter your state");
+    return;
+  }
+
+  if (!postalCode.trim()) {
+    alert("Please enter your postal code");
+    return;
+  }
+
+  try {
+    const response = await axios.post(
+      "/api/order/create",
+      {
+        fullName,
+        phone,
+        shippingAddr: address,
+        city,
+        state,
+        postalCode,
+      }
+    );
+
+    alert("Successfully submitted");
+    router.push("/orders");
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      alert(
+        error.response?.data?.message ||
+        "Failed to place order"
+      );
+
+      console.log(error.response?.data);
     }
   }
+};
 
   useEffect(() => {
     const fetch = async () => {

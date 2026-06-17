@@ -2,6 +2,19 @@
 
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+
+interface PendingSeller {
+  id: string;
+  name: string;
+  phone: string | null;
+  identityUrl: string | null;
+  createdAt: string;
+  seller: {
+    full_name: string;
+    email: string;
+  };
+}
 
 interface AdminStore {
   id: string;
@@ -10,6 +23,7 @@ interface AdminStore {
   description: string | null;
   isActive: boolean;
   isVerified: boolean;
+  isApproved: boolean;
   createdAt: string;
   seller: {
     id: string;
@@ -52,6 +66,7 @@ interface AdminStore {
 
 export default function AdminPage() {
   const [stores, setStores] = useState<AdminStore[]>([]);
+  const [pendingSellers, setPendingSellers] = useState<PendingSeller[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -59,16 +74,14 @@ export default function AdminPage() {
 
   useEffect(() => {
     loadStores();
+    loadPendingSellers();
   }, []);
 
   async function loadStores() {
     setLoading(true);
     setError("");
-
     try {
-      const response = await axios.get<{ stores: AdminStore[] }>(
-        "/api/admin/stores"
-      );
+      const response = await axios.get<{ stores: AdminStore[] }>("/api/admin/stores");
       setStores(response.data.stores);
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -78,6 +91,31 @@ export default function AdminPage() {
       }
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadPendingSellers() {
+    try {
+      const response = await axios.get<{ stores: PendingSeller[] }>("/api/admin/pending-sellers");
+      setPendingSellers(response.data.stores);
+    } catch {
+      // silently fail
+    }
+  }
+
+  async function approveSeller(storeId: string) {
+    setBusyStoreId(storeId)
+    try {
+      await axios.patch(`/api/admin/approve-seller/${storeId}`)
+      setPendingSellers((current) => current.filter((s) => s.id !== storeId))
+      setMessage("Seller approved successfully. Approval email sent.")
+      loadStores()
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Unable to approve seller")
+      }
+    } finally {
+      setBusyStoreId(null)
     }
   }
 
@@ -98,23 +136,19 @@ export default function AdminPage() {
     setBusyStoreId(store.id);
     setError("");
     setMessage("");
-
     try {
       await axios.patch(`/api/admin/stores/${store.id}`, {
         isActive: !store.isActive,
       });
-
       setStores((current) =>
         current.map((item) =>
           item.id === store.id ? { ...item, isActive: !store.isActive } : item
         )
       );
-      setMessage(store.isActive ? "Seller banned." : "Seller approved.");
+      setMessage(store.isActive ? "Seller banned." : "Seller unbanned.");
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || "Unable to update seller");
-      } else {
-        setError("Unable to update seller");
       }
     } finally {
       setBusyStoreId(null);
@@ -123,17 +157,13 @@ export default function AdminPage() {
 
   async function deleteSeller(store: AdminStore) {
     const confirmed = window.confirm(
-      `Delete seller ${store.seller.full_name} and store ${store.name}? This removes their products and related store sales records.`
+      `Delete seller ${store.seller.full_name} and store ${store.name}?`
     );
-
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     setBusyStoreId(store.id);
     setError("");
     setMessage("");
-
     try {
       await axios.delete(`/api/admin/stores/${store.id}`);
       setStores((current) => current.filter((item) => item.id !== store.id));
@@ -141,8 +171,6 @@ export default function AdminPage() {
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || "Unable to delete seller");
-      } else {
-        setError("Unable to delete seller");
       }
     } finally {
       setBusyStoreId(null);
@@ -156,10 +184,7 @@ export default function AdminPage() {
           <div className="h-40 animate-pulse rounded-2xl bg-white shadow-sm" />
           <div className="mt-6 space-y-5">
             {[1, 2, 3].map((item) => (
-              <div
-                key={item}
-                className="h-72 animate-pulse rounded-2xl bg-white shadow-sm"
-              />
+              <div key={item} className="h-72 animate-pulse rounded-2xl bg-white shadow-sm" />
             ))}
           </div>
         </div>
@@ -170,6 +195,8 @@ export default function AdminPage() {
   return (
     <main className="min-h-screen bg-slate-50 p-6 text-slate-900 md:p-8">
       <div className="mx-auto max-w-7xl">
+
+        {/* HEADER */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
           <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
             Admin control
@@ -178,19 +205,16 @@ export default function AdminPage() {
             Stores, Products and Sales
           </h1>
           <p className="mt-2 max-w-3xl text-slate-500">
-            Review seller stores, inspect all products by store, track received
-            sales, and manage seller access.
+            Review seller stores, inspect all products by store, track received sales, and manage seller access.
           </p>
         </div>
 
+        {/* SUMMARY */}
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
           <SummaryCard label="Stores" value={totals.stores} />
           <SummaryCard label="Products" value={totals.products} />
           <SummaryCard label="Orders" value={totals.orders} />
-          <SummaryCard
-            label="Revenue"
-            value={`Rs. ${totals.revenue.toLocaleString()}`}
-          />
+          <SummaryCard label="Revenue" value={`Rs. ${totals.revenue.toLocaleString()}`} />
         </div>
 
         {error && (
@@ -205,12 +229,64 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* PENDING SELLERS */}
+        {pendingSellers.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">
+              🕐 Pending Seller Approvals ({pendingSellers.length})
+            </h2>
+            <div className="space-y-4">
+              {pendingSellers.map((store) => (
+                <div
+                  key={store.id}
+                  className="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm"
+                >
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold">{store.name}</h3>
+                      <p className="mt-1 text-sm text-slate-600">
+                        Seller: {store.seller.full_name} · {store.seller.email}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-600">
+                        Phone: {store.phone || "N/A"}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-400">
+                        Submitted: {new Date(store.createdAt).toLocaleDateString()}
+                      </p>
+
+                      {store.identityUrl && (
+                        <div className="mt-3">
+                          <p className="text-sm font-medium text-slate-700 mb-2">Identity Document:</p>
+                          <Image
+                            src={store.identityUrl}
+                            alt="Identity document"
+                            width={300}
+                            height={200}
+                            className="rounded-xl border border-slate-200 object-cover"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      disabled={busyStoreId === store.id}
+                      onClick={() => approveSeller(store.id)}
+                      className="rounded-xl bg-green-600 px-6 py-3 font-semibold text-white transition hover:bg-green-700 disabled:opacity-60 h-fit"
+                    >
+                      {busyStoreId === store.id ? "Approving..." : "Approve Seller"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ALL STORES */}
         {stores.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center shadow-sm">
             <h2 className="text-2xl font-bold">No seller stores found</h2>
-            <p className="mt-2 text-slate-500">
-              Stores will appear here once sellers create them.
-            </p>
+            <p className="mt-2 text-slate-500">Stores will appear here once sellers create them.</p>
           </div>
         ) : (
           <div className="mt-6 space-y-6">
@@ -223,14 +299,19 @@ export default function AdminPage() {
                   <div>
                     <div className="flex flex-wrap items-center gap-3">
                       <h2 className="text-2xl font-bold">{store.name}</h2>
-                      <span
-                        className={`rounded-full border px-3 py-1 text-xs font-bold ${
-                          store.isActive
-                            ? "border-green-200 bg-green-50 text-green-700"
-                            : "border-red-200 bg-red-50 text-red-700"
-                        }`}
-                      >
-                        {store.isActive ? "APPROVED" : "PENDING"}
+                      <span className={`rounded-full border px-3 py-1 text-xs font-bold ${
+                        store.isApproved
+                          ? "border-green-200 bg-green-50 text-green-700"
+                          : "border-amber-200 bg-amber-50 text-amber-700"
+                      }`}>
+                        {store.isApproved ? "APPROVED" : "PENDING"}
+                      </span>
+                      <span className={`rounded-full border px-3 py-1 text-xs font-bold ${
+                        store.isActive
+                          ? "border-blue-200 bg-blue-50 text-blue-700"
+                          : "border-red-200 bg-red-50 text-red-700"
+                      }`}>
+                        {store.isActive ? "ACTIVE" : "BANNED"}
                       </span>
                     </div>
 
@@ -241,9 +322,7 @@ export default function AdminPage() {
                       Store slug: {store.slug}
                     </p>
                     {store.description && (
-                      <p className="mt-3 max-w-3xl text-slate-600">
-                        {store.description}
-                      </p>
+                      <p className="mt-3 max-w-3xl text-slate-600">{store.description}</p>
                     )}
                   </div>
 
@@ -258,7 +337,7 @@ export default function AdminPage() {
                           : "bg-green-600 text-white hover:bg-green-700"
                       }`}
                     >
-                      {store.isActive ? "Ban Seller" : "Approve Seller"}
+                      {store.isActive ? "Ban Seller" : "Unban Seller"}
                     </button>
 
                     <button
@@ -276,10 +355,7 @@ export default function AdminPage() {
                   <SummaryCard label="Products" value={store.stats.productCount} />
                   <SummaryCard label="Orders" value={store.stats.orderCount} />
                   <SummaryCard label="Sold Qty" value={store.stats.totalSold} />
-                  <SummaryCard
-                    label="Sales"
-                    value={`Rs. ${store.stats.revenue.toLocaleString()}`}
-                  />
+                  <SummaryCard label="Sales" value={`Rs. ${store.stats.revenue.toLocaleString()}`} />
                 </div>
 
                 <div className="mt-6 grid gap-5 xl:grid-cols-2">
@@ -298,10 +374,7 @@ export default function AdminPage() {
                         <tbody className="divide-y divide-slate-100">
                           {store.books.length === 0 ? (
                             <tr>
-                              <td
-                                colSpan={4}
-                                className="px-4 py-6 text-center text-slate-500"
-                              >
+                              <td colSpan={4} className="px-4 py-6 text-center text-slate-500">
                                 No products in this store.
                               </td>
                             </tr>
@@ -311,17 +384,14 @@ export default function AdminPage() {
                                 <td className="px-4 py-3">
                                   <p className="font-semibold">{book.title}</p>
                                   <p className="text-xs text-slate-500">
-                                    {book.author || "Unknown author"} · ISBN:{" "}
-                                    {book.isbn || "N/A"}
+                                    {book.author || "Unknown author"} · ISBN: {book.isbn || "N/A"}
                                   </p>
                                 </td>
                                 <td className="px-4 py-3">Rs. {book.price}</td>
                                 <td className="px-4 py-3">{book.stockQty}</td>
                                 <td className="px-4 py-3">
                                   {book.soldQty}
-                                  <p className="text-xs text-slate-500">
-                                    Rs. {book.salesAmount}
-                                  </p>
+                                  <p className="text-xs text-slate-500">Rs. {book.salesAmount}</p>
                                 </td>
                               </tr>
                             ))
@@ -340,26 +410,19 @@ export default function AdminPage() {
                         </div>
                       ) : (
                         store.sales.slice(0, 8).map((sale) => (
-                          <div
-                            key={sale.id}
-                            className="rounded-xl border border-slate-200 bg-slate-50 p-4"
-                          >
+                          <div key={sale.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                             <div className="flex items-start justify-between gap-4">
                               <div>
                                 <p className="font-semibold">{sale.bookTitle}</p>
                                 <p className="mt-1 text-xs text-slate-500">
-                                  Order #{sale.orderId.slice(0, 8)} ·{" "}
-                                  {new Date(sale.createdAt).toLocaleDateString()}
+                                  Order #{sale.orderId.slice(0, 8)} · {new Date(sale.createdAt).toLocaleDateString()}
                                 </p>
                                 <p className="mt-1 text-xs text-slate-500">
                                   {sale.customerName} · {sale.customerPhone}
                                 </p>
                               </div>
-
                               <div className="text-right">
-                                <p className="font-bold">
-                                  Rs. {sale.totalPrice}
-                                </p>
+                                <p className="font-bold">Rs. {sale.totalPrice}</p>
                                 <p className="mt-1 text-xs text-slate-500">
                                   Qty {sale.quantity} · {sale.orderStatus}
                                 </p>
@@ -380,13 +443,7 @@ export default function AdminPage() {
   );
 }
 
-function SummaryCard({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) {
+function SummaryCard({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <p className="text-sm font-medium text-slate-500">{label}</p>

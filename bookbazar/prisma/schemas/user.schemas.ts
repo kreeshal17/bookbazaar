@@ -8,6 +8,10 @@ export const userSchema = z.object({
   email: z
     .email("Invalid email address"),
 
+  phone: z
+    .string()
+    .regex(/^\+?[0-9\s-]{7,15}$/, "Invalid phone number"),
+
   password: z
     .string()
     .min(8, "Password must be at least 8 characters"),

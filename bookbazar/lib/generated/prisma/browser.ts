@@ -62,3 +62,8 @@ export type VerificationToken = Prisma.VerificationTokenModel
  * 
  */
 export type PasswordResetToken = Prisma.PasswordResetTokenModel
+/**
+ * Model Review
+ * 
+ */
+export type Review = Prisma.ReviewModel

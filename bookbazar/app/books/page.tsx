@@ -40,6 +40,7 @@ export default function BooksPage() {
 function BooksContent() {
   const searchParams = useSearchParams();
   const search = searchParams.get("search")?.trim() || "";
+  const category = searchParams.get("category")?.trim() || "";
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -50,9 +51,18 @@ function BooksContent() {
       setError("");
 
       try {
-        const url = search
-          ? `/api/book/all?search=${encodeURIComponent(search)}`
-          : "/api/book/all";
+        const params = new URLSearchParams();
+
+        if (search) {
+          params.set("search", search);
+        }
+
+        if (category) {
+          params.set("category", category);
+        }
+
+        const query = params.toString();
+        const url = query ? `/api/book/all?${query}` : "/api/book/all";
         const response = await axios.get<Book[]>(url);
         setBooks(response.data);
       } catch (err) {
@@ -67,7 +77,7 @@ function BooksContent() {
     }
 
     fetchBooks();
-  }, [search]);
+  }, [search, category]);
 
   return (
     <>
@@ -76,12 +86,18 @@ function BooksContent() {
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="mb-10 text-center md:mb-12">
             <h2 className="text-3xl font-bold text-slate-900 md:text-4xl">
-              {search ? `Search results for "${search}"` : "All Books"}
+              {search
+                ? `Search results for "${search}"`
+                : category
+                  ? `${formatCategory(category)} Books`
+                  : "All Books"}
             </h2>
 
             <p className="mt-3 text-base text-slate-600 md:text-lg">
               {search
                 ? "Showing approved seller books that match your search."
+                : category
+                  ? "Showing approved seller books from this category."
                 : "Discover books from trusted sellers across Nepal."}
             </p>
           </div>
@@ -183,4 +199,11 @@ function BooksContent() {
       <Footer />
     </>
   );
+}
+
+function formatCategory(category: string) {
+  return category
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }

@@ -9,7 +9,10 @@ export async function POST(req: NextRequest) {
   const user = await prisma.user.findUnique({ where: { email } })
 
   if (!user) {
-    return NextResponse.json({ message: 'If this email exists, a reset link has been sent.' })
+    return NextResponse.json(
+      { error: 'No account found with this email' },
+      { status: 404 }
+    )
   }
 
   await prisma.passwordResetToken.deleteMany({ where: { userId: user.id } })

@@ -1,129 +1,168 @@
-'use client'
+"use client";
 
-import axios from "axios"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 
 export default function Onboard() {
+  const router = useRouter();
 
-const router = useRouter()
+  const [storename, setStorename] = useState("");
+  const [description, setDescription] = useState("");
+  const [phone, setPhone] = useState("");
+  const [identityFile, setIdentityFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-const [storename, setStorename] = useState("")
-const [description, setDescription] = useState("")
-const [loading, setLoading] = useState(false)
-
-async function handleSubmit(e: any) {
-
-
-e.preventDefault()
-
-try {
-
-  setLoading(true)
-
-  const response = await axios.post(
-    "/api/store/create",
-    {
-      storename,
-      description
+  async function uploadIdentity() {
+    if (!identityFile) {
+      throw new Error("Identity document is required");
     }
-  )
 
-  alert(response.data.message)
+    const formData = new FormData();
+    formData.append("file", identityFile);
 
-  router.push("/seller/dashboard")
+    const response = await axios.post("/api/upload", formData);
+    return response.data.url as string;
+  }
 
-} catch (error: any) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+    setError("");
 
-  alert(
-    error?.response?.data?.message ||
-    "Something went wrong"
-  )
+    try {
+      if (!/^\+?[0-9\s-]{7,15}$/.test(phone.trim())) {
+        throw new Error("Please enter a valid phone number");
+      }
 
-} finally {
-  setLoading(false)
+      const identityUrl = await uploadIdentity();
 
+      const response = await axios.post("/api/store/create", {
+        storename,
+        description,
+        phone,
+        identityUrl,
+      });
 
+      setMessage(response.data.message);
 
-}
-}
+      setTimeout(() => {
+        router.push("/seller/dashboard");
+      }, 1200);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Something went wrong");
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
-return ( <div className="min-h-screen bg-[#0f3460] flex items-center justify-center px-4">
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
+      <div className="w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-xl md:p-8">
+        <div className="mb-8 text-center">
+          <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
+            Seller verification
+          </p>
+          <h1 className="mt-2 text-3xl font-bold text-slate-900">
+            Create Your Store
+          </h1>
+          <p className="mt-2 text-slate-500">
+            Submit your store details for admin approval.
+          </p>
+        </div>
 
+        <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
+          Your identity information is collected solely to protect against fraud
+          and verify seller authenticity. It will only be reviewed by BookMandu
+          admin.
+        </div>
 
-  <div className="w-full max-w-md">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Store Name
+            </label>
+            <input
+              type="text"
+              value={storename}
+              onChange={(e) => setStorename(e.target.value)}
+              placeholder="Krishal Book Hub"
+              required
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+            />
+          </div>
 
-    <div className="bg-[#1a1a2e] border border-[#e94560]/20 rounded-xl shadow-lg p-8">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+977 98XXXXXXXX"
+              required
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+            />
+          </div>
 
-      <div className="mb-8 text-center">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Description
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Tell buyers about your store..."
+              rows={4}
+              required
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+            />
+          </div>
 
-        <h1 className="text-3xl font-bold text-[#eaeaea]">
-          Create Your Store
-        </h1>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Identity Document
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              required
+              onChange={(e) => setIdentityFile(e.target.files?.[0] || null)}
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 file:mr-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:font-semibold file:text-indigo-700"
+            />
+          </div>
 
-        <p className="text-[#a8a8b3] mt-2">
-          Start selling books on BookBazaar
-        </p>
+          {error && (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+              {error}
+            </div>
+          )}
 
+          {message && (
+            <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+              {message}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? "Submitting..." : "Submit for Approval"}
+          </button>
+        </form>
       </div>
-
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-5"
-      >
-
-        <div>
-          <label className="block text-[#eaeaea] mb-2 text-sm">
-            Store Name
-          </label>
-
-          <input
-            type="text"
-            value={storename}
-            onChange={(e) =>
-              setStorename(e.target.value)
-            }
-            placeholder="Krishal Book Hub"
-            required
-            className="w-full bg-[#16213e] border border-[#e94560]/30 text-[#eaeaea] rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#e94560]"
-          />
-        </div>
-
-        <div>
-          <label className="block text-[#eaeaea] mb-2 text-sm">
-            Description
-          </label>
-
-          <textarea
-            value={description}
-            onChange={(e) =>
-              setDescription(e.target.value)
-            }
-            placeholder="Tell buyers about your store..."
-            rows={4}
-            className="w-full bg-[#16213e] border border-[#e94560]/30 text-[#eaeaea] rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#e94560]"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-[#e94560] hover:bg-[#c73652] text-white rounded-lg px-6 py-3 font-semibold transition-all"
-        >
-          {loading
-            ? "Creating Store..."
-            : "Create Store"}
-        </button>
-
-      </form>
-
     </div>
-
-  </div>
-
-</div>
-
-
-)}
-
-
+  );
+}

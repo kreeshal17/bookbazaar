@@ -2,6 +2,7 @@ import {z} from "zod"
 import prisma from "@/lib/prisma"
 import { cookies } from "next/headers"
 import { decrypt } from "@/app/lib/session"
+import { resend } from "@/lib/resend/resend"
  const storeSchema = z.object({
   storename: z
     .string()
@@ -11,7 +12,15 @@ import { decrypt } from "@/app/lib/session"
   description: z
     .string()
     .min(10, "Description too short")
-    .max(500, "Description too long")
+    .max(500, "Description too long"),
+
+  phone: z
+    .string()
+    .regex(/^\+?[0-9\s-]{7,15}$/, "Invalid phone number"),
+
+  identityUrl: z
+    .string()
+    .url("Identity document is required")
 })
 
 export async function POST(req:Request)
@@ -32,7 +41,7 @@ if (!result.success) {
   )
 }
 
-const{storename,description}= result.data
+const{storename,description,phone,identityUrl}= result.data
 
 
 const  cookieStore=await cookies()
@@ -58,6 +67,17 @@ const sessionCookie=cookieStore.get("session")?.value
         },
         {
           status: 401
+        }
+      )
+    }
+
+    if (payload.role !== "SELLER") {
+      return Response.json(
+        {
+          message: "Only sellers can create a store"
+        },
+        {
+          status: 403
         }
       )
     }
@@ -94,9 +114,32 @@ const slug=storename.trim().toLowerCase().replace(" ","-")
           name: storename,
           slug,
           description,
-          isActive: false
+          phone,
+          identityUrl,
+          isActive: false,
+          isApproved: false
         }
       })
+
+    const adminEmail = process.env.ADMIN_EMAIL
+
+    if (adminEmail) {
+      await resend.emails.send({
+        from: "BookMandu <noreply@krishalkarna.com.np>",
+        to: adminEmail,
+        subject: "New seller approval request",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto;">
+            <h2>New seller submitted onboarding</h2>
+            <p><strong>Seller:</strong> ${payload.email}</p>
+            <p><strong>Store:</strong> ${store.name}</p>
+            <p><strong>Phone:</strong> ${store.phone}</p>
+            <p><strong>Identity document:</strong> <a href="${store.identityUrl}">View document</a></p>
+            <p><a href="${process.env.NEXT_PUBLIC_APP_URL || ""}/admin">Open admin panel</a></p>
+          </div>
+        `,
+      })
+    }
 
 
 
@@ -105,7 +148,7 @@ const slug=storename.trim().toLowerCase().replace(" ","-")
 
   return Response.json(
       {
-        message: "Store created successfully",
+        message: "Store submitted successfully. BookMandu admin will review your identity before approving your store.",
         store
       },
       {
