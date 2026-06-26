@@ -1,5 +1,4 @@
 'use client'
-import redis from "@/lib/redis/redis"
 import axios from "axios"
 import { useState } from "react"
 import Link  from "next/link"
@@ -8,9 +7,14 @@ export default function Login() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const router= useRouter()
-async function handleForm(e:any) {
+async function handleForm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    setErrorMessage("")
+    setIsSubmitting(true)
     try {
       const response = await axios.post("/api/auth/login", {
         email,
@@ -33,17 +37,27 @@ async function handleForm(e:any) {
         router.push("/")
       }
 
-    } catch(error:any) {
-      if(error.response.status === 429) {
-        alert("Too many attempts, retry after sometime")
-      }
+    } catch(error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status
+        const message = error.response?.data?.message
 
-     if(error.response.status === 403) {
-  alert("Please verify your email. We've sent a new verification email to your inbox.")
-}
-      if(error.response.status === 401) {
-        alert("Invalid email or password")
+        if (status === 429) {
+          setErrorMessage("Too many attempts. Please try again after a while.")
+        } else if (status === 403) {
+          setErrorMessage("Please verify your email. We've sent a new verification email to your inbox.")
+        } else if (status === 404) {
+          setErrorMessage(message ?? "No user found with that email.")
+        } else if (status === 401) {
+          setErrorMessage(message ?? "Wrong password.")
+        } else {
+          setErrorMessage("Login failed. Please try again.")
+        }
+      } else {
+        setErrorMessage("Login failed. Please try again.")
       }
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -66,6 +80,12 @@ async function handleForm(e:any) {
 
         <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
 
+          {errorMessage ? (
+            <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMessage}
+            </div>
+          ) : null}
+
           <form onSubmit={handleForm} className="space-y-5">
 
             <div>
@@ -87,13 +107,36 @@ async function handleForm(e:any) {
                 Password
               </label>
 
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-600 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 text-slate-900 placeholder-slate-600 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((current) => !current)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute inset-y-0 right-3 flex items-center text-slate-500 transition hover:text-indigo-600"
+                >
+                  {showPassword ? (
+                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 3l18 18" />
+                      <path d="M10.58 10.58A2 2 0 0 0 12 15a2 2 0 0 0 1.42-.58" />
+                      <path d="M9.88 5.09A10.94 10.94 0 0 1 12 5c5.5 0 9.5 7 9.5 7a20.23 20.23 0 0 1-4.1 4.6" />
+                      <path d="M6.61 6.61C3.85 8.7 2.5 12 2.5 12s2.5 7 9.5 7c1.56 0 2.96-.28 4.18-.74" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between text-sm">
@@ -112,9 +155,10 @@ async function handleForm(e:any) {
 
             <button
               type="submit"
+              disabled={isSubmitting}
               className="w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white transition hover:bg-indigo-700"
             >
-              Login
+              {isSubmitting ? "Logging in..." : "Login"}
             </button>
 
           </form>
@@ -152,7 +196,7 @@ async function handleForm(e:any) {
     </div>
 
     {/* RIGHT BRANDING */}
-    <div className="hidden lg:flex lg:w-[58%] relative overflow-hidden bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900">
+    <div className="hidden lg:flex lg:w-[58%] relative overflow-hidden bg-linear-to-br from-indigo-700 via-indigo-800 to-slate-900">
 
       <div className="absolute top-10 left-10 h-72 w-72 rounded-full bg-indigo-400/20 blur-3xl" />
       <div className="absolute bottom-10 right-10 h-72 w-72 rounded-full bg-purple-400/20 blur-3xl" />

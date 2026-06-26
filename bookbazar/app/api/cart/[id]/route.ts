@@ -2,36 +2,20 @@ import { decrypt } from "@/app/lib/session";
 import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { z } from "zod";
+import { requireActiveUser } from "@/app/lib/active-user";
 
 const cartActionSchema = z.object({
   action: z.enum(["increment", "decrement"]),
 });
 
 async function getUserId() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value;
+  const { error, user } = await requireActiveUser();
 
-  if (!session) {
-    return {
-      error: Response.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      ),
-    };
+  if (error) {
+    return { error };
   }
 
-  const payload = await decrypt(session);
-
-  if (!payload) {
-    return {
-      error: Response.json(
-        { message: "Invalid session" },
-        { status: 401 }
-      ),
-    };
-  }
-
-  return { userId: payload.id as string };
+  return { userId: user.id };
 }
 
 export async function PATCH(

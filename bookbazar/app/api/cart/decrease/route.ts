@@ -1,9 +1,10 @@
-import prisma from "@/lib/prisma";
-import { decrypt } from "@/app/lib/session";
-import { cookies } from "next/headers";
+import prisma from "@/lib/prisma"
+import { decrypt } from "@/app/lib/session"
+import { cookies } from "next/headers"
+import { requireActiveUser } from "@/app/lib/active-user"
 
 export async function PATCH(req: Request) {
-  const session = (await cookies()).get("session")?.value;
+  const session = (await cookies()).get("session")?.value
 
   if (!session) {
     return Response.json(
@@ -13,10 +14,10 @@ export async function PATCH(req: Request) {
       {
         status: 401,
       }
-    );
+    )
   }
 
-  const payload = await decrypt(session);
+  const payload = await decrypt(session)
 
   if (!payload) {
     return Response.json(
@@ -26,16 +27,22 @@ export async function PATCH(req: Request) {
       {
         status: 401,
       }
-    );
+    )
   }
 
-  const { cartItemId } = await req.json();
+  const { error } = await requireActiveUser()
+
+  if (error) {
+    return error
+  }
+
+  const { cartItemId } = await req.json()
 
   const cartItem = await prisma.cartItem.findUnique({
     where: {
       id: cartItemId,
     },
-  });
+  })
 
   if (!cartItem) {
     return Response.json(
@@ -45,7 +52,7 @@ export async function PATCH(req: Request) {
       {
         status: 404,
       }
-    );
+    )
   }
 
   if (cartItem.quantity > 1) {
@@ -58,16 +65,16 @@ export async function PATCH(req: Request) {
           decrement: 1,
         },
       },
-    });
+    })
   } else {
     await prisma.cartItem.delete({
       where: {
         id: cartItemId,
       },
-    });
+    })
   }
 
   return Response.json({
     message: "Cart Updated Successfully",
-  });
+  })
 }

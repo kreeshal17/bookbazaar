@@ -1,6 +1,7 @@
 import { decrypt } from "@/app/lib/session";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
+import { requireActiveUser } from "@/app/lib/active-user";
 export async function GET(){
 
 const sessionCOokie= await cookies();
@@ -26,11 +27,16 @@ if(!payload)
         status:401
     })
 }
-const {id}=payload
+
+const { error, user } = await requireActiveUser()
+
+if (error) {
+    return error
+}
 
 const cartitems= await prisma.cartItem.findMany({
 where:{
-    userId:id as string,
+    userId:user.id,
     book:{
         isActive:true,
         store:{

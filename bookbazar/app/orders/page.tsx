@@ -10,6 +10,7 @@ interface Order {
   id: string
   status: string
   totalAmount: string
+  deliveryCode: string | null
   shippingAddr: string
   city: string
   state: string
@@ -173,6 +174,20 @@ export default function OrdersPage() {
                 {/* Summary */}
                 <div className="mt-8 border-t border-slate-200 pt-6">
 
+                  {order.deliveryCode && (
+                    <div className="mb-6 rounded-2xl border border-dashed border-indigo-200 bg-indigo-50 p-4">
+                      <p className="text-sm font-semibold uppercase tracking-wide text-indigo-700">
+                        Delivery code
+                      </p>
+                      <p className="mt-2 text-2xl font-bold text-indigo-700">
+                        {order.deliveryCode}
+                      </p>
+                      <p className="mt-2 text-sm text-indigo-700/80">
+                        Share this code with the seller only after you receive the product.
+                      </p>
+                    </div>
+                  )}
+
                   <h4 className="text-lg font-bold text-slate-900">
                     Shipping Address
                   </h4>
@@ -189,7 +204,7 @@ export default function OrdersPage() {
                     {order.postalCode}
                   </p>
 
-                  <div className="mt-6 flex items-center justify-between rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 p-5">
+                  <div className="mt-6 flex items-center justify-between rounded-2xl bg-linear-to-r from-indigo-50 to-purple-50 p-5">
 
                     <span className="text-xl font-semibold text-slate-700">
                       Grand Total

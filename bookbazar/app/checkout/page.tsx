@@ -71,7 +71,7 @@ export default function checkout() {
       }
     );
 
-    alert("Successfully submitted");
+    alert(`Order placed successfully. Your delivery code is ${response.data.deliveryCode}. Share it with the seller only after receiving the product.`);
     router.push("/orders");
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -236,7 +236,10 @@ export default function checkout() {
                   className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
                 >
                   <div className="flex gap-4">
-                    <div className="flex h-24 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-3xl text-white md:h-28 md:w-20">
+                    <div
+                      className="flex h-24 w-16 shrink-0 items-center justify-center rounded-xl text-3xl text-white md:h-28 md:w-20"
+                      style={{ backgroundImage: "linear-gradient(135deg, #6366f1 0%, #9333ea 100%)" }}
+                    >
                       📚
                     </div>
                     <div className="flex flex-1 flex-col justify-between">

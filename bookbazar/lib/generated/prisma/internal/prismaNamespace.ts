@@ -1202,6 +1202,7 @@ export const UserScalarFieldEnum = {
   created_at: 'created_at',
   updated_at: 'updated_at',
   isVerified: 'isVerified',
+  isBlocked: 'isBlocked',
   phone: 'phone'
 } as const
 
@@ -1263,6 +1264,7 @@ export const OrderScalarFieldEnum = {
   buyerId: 'buyerId',
   status: 'status',
   totalAmount: 'totalAmount',
+  deliveryCode: 'deliveryCode',
   fullName: 'fullName',
   phone: 'phone',
   shippingAddr: 'shippingAddr',

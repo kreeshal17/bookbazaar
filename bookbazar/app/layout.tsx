@@ -3,6 +3,11 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
+const SITE_URL = "https://www.bookmandu.vercel.app";
+const SITE_NAME = "BookMandu";
+const SEO_DESCRIPTION =
+  "BookMandu is Nepal's trusted online book marketplace to buy and sell new or used books. Discover textbooks, novels, comics, self-help, and more at unbeatable prices. List your books and earn today!";
+
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
@@ -17,16 +22,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "BookMandu",
-    template: "%s | BookMandu",
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
   icons: {
-    icon: "/title.png",
-    shortcut: "/title.png",
-    apple: "/title.png",
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
-  description:
-    "BookMandu is Nepal's trusted online book marketplace to buy and sell new or used books. Discover textbooks, novels, comics, self-help, and more at unbeatable prices. List your books and earn today!",
+  description: SEO_DESCRIPTION,
   keywords: [
     "buy books online",
     "sell books online",
@@ -44,25 +48,25 @@ export const metadata: Metadata = {
     "bookmandu",
     "book bazaar",
   ],
-  authors: [{ name: "BookMandu", url: "https://www.bookmandu.vercel.app" }],
-  creator: "BookMandu",
-  publisher: "BookMandu",
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
   category: "Books & Literature",
-  metadataBase: new URL("https://www.bookmandu.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   alternates: {
-    canonical: "https://www.bookmandu.vercel.app",
+    canonical: SITE_URL,
   },
   openGraph: {
-    title: "BookMandu | Buy & Sell Books Online",
+    title: `${SITE_NAME} | Buy & Sell Books Online`,
     description:
-      "Discover thousands of new and used books on BookMandu. Buy cheap textbooks, novels, and more — or sell your old books and earn cash instantly.",
-    url: "https://www.bookmandu.vercel.app",
-    siteName: "BookMandu",
+      "Discover thousands of new and used books on BookMandu. Buy cheap textbooks, novels, and more or sell your old books and earn cash instantly.",
+    url: SITE_URL,
+    siteName: SITE_NAME,
     type: "website",
     locale: "en_IN",
     images: [
       {
-        url: "",
+        url: "/title.png",
         width: 1200,
         height: 630,
         alt: "BookMandu - Buy & Sell Books Online",
@@ -71,10 +75,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "BookMandu | Buy & Sell Books Online",
+    title: `${SITE_NAME} | Buy & Sell Books Online`,
     description:
       "Buy and sell books easily on BookMandu. Best prices on textbooks, novels, comics, and more.",
-    images: ["/og-image.png"],
+    images: ["/title.png"],
     creator: "@bookmandu",
   },
   robots: {
@@ -87,9 +91,6 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  },
-  verification: {
-    google: "add-your-google-search-console-verification-code-here",
   },
 };
 

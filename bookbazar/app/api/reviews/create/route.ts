@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma"
 import { NextRequest, NextResponse } from "next/server"
-import { cookies } from "next/headers"
-import { decrypt } from "@/app/lib/session"
+import { requireActiveUser } from "@/app/lib/active-user"
 import { z } from "zod"
 
 const reviewSchema = z.object({
@@ -11,13 +10,9 @@ const reviewSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies()
-  const session = cookieStore.get("session")?.value
+  const { error, user } = await requireActiveUser()
 
-  if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
-
-  const payload = await decrypt(session)
-  if (!payload) return NextResponse.json({ message: "Invalid session" }, { status: 401 })
+  if (error) return error
 
   const body = await req.json()
   const result = reviewSchema.safeParse(body)
@@ -28,7 +23,7 @@ export async function POST(req: NextRequest) {
 
   // check if user already reviewed
   const existing = await prisma.review.findUnique({
-    where: { bookId_userId: { bookId, userId: payload.id as string } }
+    where: { bookId_userId: { bookId, userId: user.id } }
   })
 
   if (existing) {
@@ -39,8 +34,8 @@ export async function POST(req: NextRequest) {
   const deliveredOrder = await prisma.orderItem.findFirst({
     where: {
       bookId,
-      order: {
-        buyerId: payload.id as string,
+      order: { 
+        buyerId: user.id,
         status: "DELIVERED"
       }
     }
@@ -53,7 +48,7 @@ export async function POST(req: NextRequest) {
   const review = await prisma.review.create({
     data: {
       bookId,
-      userId: payload.id as string,
+      userId: user.id,
       rating,
       comment
     }

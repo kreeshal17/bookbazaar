@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { cookies } from 'next/headers'
 import { decrypt } from '@/app/lib/session'
-import { resend } from '@/lib/resend/resend'
+import { sendSellerApprovalEmail } from '@/lib/resend/seller-emails'
 
 export async function PATCH(
   req: NextRequest,
@@ -32,20 +32,9 @@ const store = await prisma.store.update({
   },
 });
 
-  await resend.emails.send({
-    from: 'BookMandu <noreply@krishalkarna.com.np>',
-    to: store.seller.email,
-    subject: 'Your BookMandu store is approved!',
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2>Congratulations, ${store.seller.full_name}!</h2>
-        <p>Your store <strong>${store.name}</strong> has been approved by BookMandu admin.</p>
-        <p>You can now list books and start selling.</p>
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/seller/dashboard" style="background:#4f46e5;color:white;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;margin:16px 0;">
-          Go to Dashboard
-        </a>
-      </div>
-    `
+  await sendSellerApprovalEmail({
+    email: store.seller.email,
+    sellerName: store.seller.full_name,
   })
 
   return NextResponse.json({ message: 'Seller approved and email sent.' })

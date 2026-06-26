@@ -34,6 +34,7 @@ export type UserMinAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   isVerified: boolean | null
+  isBlocked: boolean | null
   phone: string | null
 }
 
@@ -47,6 +48,7 @@ export type UserMaxAggregateOutputType = {
   created_at: Date | null
   updated_at: Date | null
   isVerified: boolean | null
+  isBlocked: boolean | null
   phone: string | null
 }
 
@@ -60,6 +62,7 @@ export type UserCountAggregateOutputType = {
   created_at: number
   updated_at: number
   isVerified: number
+  isBlocked: number
   phone: number
   _all: number
 }
@@ -75,6 +78,7 @@ export type UserMinAggregateInputType = {
   created_at?: true
   updated_at?: true
   isVerified?: true
+  isBlocked?: true
   phone?: true
 }
 
@@ -88,6 +92,7 @@ export type UserMaxAggregateInputType = {
   created_at?: true
   updated_at?: true
   isVerified?: true
+  isBlocked?: true
   phone?: true
 }
 
@@ -101,6 +106,7 @@ export type UserCountAggregateInputType = {
   created_at?: true
   updated_at?: true
   isVerified?: true
+  isBlocked?: true
   phone?: true
   _all?: true
 }
@@ -187,6 +193,7 @@ export type UserGroupByOutputType = {
   created_at: Date
   updated_at: Date
   isVerified: boolean
+  isBlocked: boolean
   phone: string | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
@@ -221,6 +228,7 @@ export type UserWhereInput = {
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"User"> | Date | string
   isVerified?: Prisma.BoolFilter<"User"> | boolean
+  isBlocked?: Prisma.BoolFilter<"User"> | boolean
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   store?: Prisma.XOR<Prisma.StoreNullableScalarRelationFilter, Prisma.StoreWhereInput> | null
   orders?: Prisma.OrderListRelationFilter
@@ -240,6 +248,7 @@ export type UserOrderByWithRelationInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
+  isBlocked?: Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   store?: Prisma.StoreOrderByWithRelationInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
@@ -262,6 +271,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"User"> | Date | string
   isVerified?: Prisma.BoolFilter<"User"> | boolean
+  isBlocked?: Prisma.BoolFilter<"User"> | boolean
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   store?: Prisma.XOR<Prisma.StoreNullableScalarRelationFilter, Prisma.StoreWhereInput> | null
   orders?: Prisma.OrderListRelationFilter
@@ -281,6 +291,7 @@ export type UserOrderByWithAggregationInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
+  isBlocked?: Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -300,6 +311,7 @@ export type UserScalarWhereWithAggregatesInput = {
   created_at?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   isVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  isBlocked?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
@@ -313,6 +325,7 @@ export type UserCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   store?: Prisma.StoreCreateNestedOneWithoutSellerInput
   orders?: Prisma.OrderCreateNestedManyWithoutBuyerInput
@@ -332,6 +345,7 @@ export type UserUncheckedCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   store?: Prisma.StoreUncheckedCreateNestedOneWithoutSellerInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBuyerInput
@@ -351,6 +365,7 @@ export type UserUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   store?: Prisma.StoreUpdateOneWithoutSellerNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBuyerNestedInput
@@ -370,6 +385,7 @@ export type UserUncheckedUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   store?: Prisma.StoreUncheckedUpdateOneWithoutSellerNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBuyerNestedInput
@@ -389,6 +405,7 @@ export type UserCreateManyInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
 }
 
@@ -402,6 +419,7 @@ export type UserUpdateManyMutationInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -415,6 +433,7 @@ export type UserUncheckedUpdateManyInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -428,6 +447,7 @@ export type UserCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
+  isBlocked?: Prisma.SortOrder
   phone?: Prisma.SortOrder
 }
 
@@ -441,6 +461,7 @@ export type UserMaxOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
+  isBlocked?: Prisma.SortOrder
   phone?: Prisma.SortOrder
 }
 
@@ -454,6 +475,7 @@ export type UserMinOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
+  isBlocked?: Prisma.SortOrder
   phone?: Prisma.SortOrder
 }
 
@@ -576,6 +598,7 @@ export type UserCreateWithoutStoreInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   orders?: Prisma.OrderCreateNestedManyWithoutBuyerInput
   cartItems?: Prisma.CartItemCreateNestedManyWithoutUserInput
@@ -594,6 +617,7 @@ export type UserUncheckedCreateWithoutStoreInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBuyerInput
   cartItems?: Prisma.CartItemUncheckedCreateNestedManyWithoutUserInput
@@ -628,6 +652,7 @@ export type UserUpdateWithoutStoreInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orders?: Prisma.OrderUpdateManyWithoutBuyerNestedInput
   cartItems?: Prisma.CartItemUpdateManyWithoutUserNestedInput
@@ -646,6 +671,7 @@ export type UserUncheckedUpdateWithoutStoreInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBuyerNestedInput
   cartItems?: Prisma.CartItemUncheckedUpdateManyWithoutUserNestedInput
@@ -664,6 +690,7 @@ export type UserCreateWithoutOrdersInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   store?: Prisma.StoreCreateNestedOneWithoutSellerInput
   cartItems?: Prisma.CartItemCreateNestedManyWithoutUserInput
@@ -682,6 +709,7 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   store?: Prisma.StoreUncheckedCreateNestedOneWithoutSellerInput
   cartItems?: Prisma.CartItemUncheckedCreateNestedManyWithoutUserInput
@@ -716,6 +744,7 @@ export type UserUpdateWithoutOrdersInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   store?: Prisma.StoreUpdateOneWithoutSellerNestedInput
   cartItems?: Prisma.CartItemUpdateManyWithoutUserNestedInput
@@ -734,6 +763,7 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   store?: Prisma.StoreUncheckedUpdateOneWithoutSellerNestedInput
   cartItems?: Prisma.CartItemUncheckedUpdateManyWithoutUserNestedInput
@@ -752,6 +782,7 @@ export type UserCreateWithoutCartItemsInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   store?: Prisma.StoreCreateNestedOneWithoutSellerInput
   orders?: Prisma.OrderCreateNestedManyWithoutBuyerInput
@@ -770,6 +801,7 @@ export type UserUncheckedCreateWithoutCartItemsInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   store?: Prisma.StoreUncheckedCreateNestedOneWithoutSellerInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBuyerInput
@@ -804,6 +836,7 @@ export type UserUpdateWithoutCartItemsInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   store?: Prisma.StoreUpdateOneWithoutSellerNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBuyerNestedInput
@@ -822,6 +855,7 @@ export type UserUncheckedUpdateWithoutCartItemsInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   store?: Prisma.StoreUncheckedUpdateOneWithoutSellerNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBuyerNestedInput
@@ -840,6 +874,7 @@ export type UserCreateWithoutVerificationTokensInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   store?: Prisma.StoreCreateNestedOneWithoutSellerInput
   orders?: Prisma.OrderCreateNestedManyWithoutBuyerInput
@@ -858,6 +893,7 @@ export type UserUncheckedCreateWithoutVerificationTokensInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   store?: Prisma.StoreUncheckedCreateNestedOneWithoutSellerInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBuyerInput
@@ -892,6 +928,7 @@ export type UserUpdateWithoutVerificationTokensInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   store?: Prisma.StoreUpdateOneWithoutSellerNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBuyerNestedInput
@@ -910,6 +947,7 @@ export type UserUncheckedUpdateWithoutVerificationTokensInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   store?: Prisma.StoreUncheckedUpdateOneWithoutSellerNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBuyerNestedInput
@@ -928,6 +966,7 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   store?: Prisma.StoreCreateNestedOneWithoutSellerInput
   orders?: Prisma.OrderCreateNestedManyWithoutBuyerInput
@@ -946,6 +985,7 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   store?: Prisma.StoreUncheckedCreateNestedOneWithoutSellerInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBuyerInput
@@ -980,6 +1020,7 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   store?: Prisma.StoreUpdateOneWithoutSellerNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBuyerNestedInput
@@ -998,6 +1039,7 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   store?: Prisma.StoreUncheckedUpdateOneWithoutSellerNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBuyerNestedInput
@@ -1016,6 +1058,7 @@ export type UserCreateWithoutReviewsInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   store?: Prisma.StoreCreateNestedOneWithoutSellerInput
   orders?: Prisma.OrderCreateNestedManyWithoutBuyerInput
@@ -1034,6 +1077,7 @@ export type UserUncheckedCreateWithoutReviewsInput = {
   created_at?: Date | string
   updated_at?: Date | string
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: string | null
   store?: Prisma.StoreUncheckedCreateNestedOneWithoutSellerInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBuyerInput
@@ -1068,6 +1112,7 @@ export type UserUpdateWithoutReviewsInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   store?: Prisma.StoreUpdateOneWithoutSellerNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBuyerNestedInput
@@ -1086,6 +1131,7 @@ export type UserUncheckedUpdateWithoutReviewsInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isBlocked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   store?: Prisma.StoreUncheckedUpdateOneWithoutSellerNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBuyerNestedInput
@@ -1171,6 +1217,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   created_at?: boolean
   updated_at?: boolean
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: boolean
   store?: boolean | Prisma.User$storeArgs<ExtArgs>
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
@@ -1191,6 +1238,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   created_at?: boolean
   updated_at?: boolean
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -1204,6 +1252,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   created_at?: boolean
   updated_at?: boolean
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -1217,10 +1266,11 @@ export type UserSelectScalar = {
   created_at?: boolean
   updated_at?: boolean
   isVerified?: boolean
+  isBlocked?: boolean
   phone?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "full_name" | "password_hash" | "avatarUrl" | "role" | "created_at" | "updated_at" | "isVerified" | "phone", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "full_name" | "password_hash" | "avatarUrl" | "role" | "created_at" | "updated_at" | "isVerified" | "isBlocked" | "phone", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   store?: boolean | Prisma.User$storeArgs<ExtArgs>
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
@@ -1253,6 +1303,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     created_at: Date
     updated_at: Date
     isVerified: boolean
+    isBlocked: boolean
     phone: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
@@ -1692,6 +1743,7 @@ export interface UserFieldRefs {
   readonly created_at: Prisma.FieldRef<"User", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"User", 'DateTime'>
   readonly isVerified: Prisma.FieldRef<"User", 'Boolean'>
+  readonly isBlocked: Prisma.FieldRef<"User", 'Boolean'>
   readonly phone: Prisma.FieldRef<"User", 'String'>
 }
     

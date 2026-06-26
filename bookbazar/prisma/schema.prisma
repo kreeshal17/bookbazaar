@@ -39,6 +39,7 @@ model User {
   created_at          DateTime             @default(now())
   updated_at          DateTime             @updatedAt
   isVerified          Boolean              @default(false)
+  isBlocked           Boolean              @default(false)
   phone               String?
 
   store               Store?
@@ -117,6 +118,7 @@ model Order {
   buyerId      String
   status       OrderStatus @default(PENDING)
   totalAmount  Decimal     @db.Decimal(10, 2)
+  deliveryCode String?
   fullName     String
   phone        String
   shippingAddr String

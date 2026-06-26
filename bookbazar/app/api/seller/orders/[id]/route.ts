@@ -4,7 +4,8 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 
 const statusSchema = z.object({
-  status: z.enum(["PENDING", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"]),
+  status: z.enum(["PENDING", "CONFIRMED", "SHIPPED", "DELIVERED"]),
+  deliveryCode: z.string().optional(),
 });
 
 async function getSellerStore() {
@@ -59,13 +60,15 @@ export async function PATCH(
     return Response.json({ message: "Order not found" }, { status: 404 });
   }
 
-  // if cancelling — increase stock back
-  if (result.data.status === "CANCELLED" && order.status !== "CANCELLED") {
-    for (const item of order.items) {
-      await prisma.book.update({
-        where: { id: item.bookId },
-        data: { stockQty: { increment: item.quantity } }
-      })
+  const deliveryCode = (order as typeof order & { deliveryCode?: string | null }).deliveryCode;
+
+  if (order.status === "DELIVERED" || order.status === "CANCELLED") {
+    return Response.json({ message: "This order can no longer be changed" }, { status: 400 });
+  }
+
+  if (result.data.status === "DELIVERED") {
+    if (!result.data.deliveryCode || result.data.deliveryCode !== deliveryCode) {
+      return Response.json({ message: "Invalid delivery code" }, { status: 400 });
     }
   }
 

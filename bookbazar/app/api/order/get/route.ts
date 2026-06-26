@@ -1,64 +1,66 @@
-
 import { decrypt } from "@/app/lib/session"
 import { cookies } from "next/headers"
 import prisma from "@/lib/prisma"
 
-export async function GET(){
+export async function GET() {
+  const sessionCookie = await cookies()
+  const session = sessionCookie.get("session")?.value
 
-
-const sessionCookie= await cookies()
-const session= sessionCookie.get("session")?.value
-
-if(!session)
-{
-
+  if (!session) {
     return Response.json({
+      message: "unauthorized user"
+    }, {
+      status: 401
+    })
+  }
 
+  const payload = await decrypt(session)
 
-    message:"uynauthorized one"
-    },
-{status:401})
-}
-
-const payload=await decrypt(session)
-
-
-if(!payload)
-{
-
+  if (!payload) {
     return Response.json({
+      message: "invalid session"
+    }, {
+      status: 401
+    })
+  }
 
+  const user = await prisma.user.findUnique({
+    where: { id: payload.id as string },
+    select: { isBlocked: true }
+  })
 
-    message:"invalid session"
+  if (!user) {
+    return Response.json({
+      message: "User not found"
+    }, {
+      status: 404
+    })
+  }
+
+  if (user.isBlocked) {
+    return Response.json({
+      message: "Your account is blocked. Contact support."
+    }, {
+      status: 403
+    })
+  }
+
+  const result = await prisma.order.findMany({
+    where: {
+      buyerId: payload.id as string
     },
-{status:401})
-}
-
-
-const {id}= payload
-
-
-const result= await prisma.order.findMany({
-   where:{
-     buyerId:id as string
-   },
-   include:{
-    items:{
-        include:{
-            book:true,
-            store:true
+    include: {
+      items: {
+        include: {
+          book: true,
+          store: true
         }
+      }
+    },
+    orderBy: {
+      createdAt: "desc"
     }
-   },
-   orderBy:{
-    createdAt:"desc"
-   }
+  })
 
-
-
-
-
- })
-
-return Response.json(result)
+  return Response.json(result)
 }

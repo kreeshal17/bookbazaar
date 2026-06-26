@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
-import { decrypt } from "@/app/lib/session";
-import { cookies } from "next/headers";
+import { randomInt } from "crypto";
+import { requireActiveUser } from "@/app/lib/active-user";
 import { z } from "zod";
 
 export const orderSchema = z.object({
@@ -14,17 +14,10 @@ export const orderSchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const sessionCookie = await cookies()
-  const session = sessionCookie.get("session")?.value
+  const { error, user } = await requireActiveUser()
 
-  if (!session) {
-    return Response.json({ message: "Unauthorized access" }, { status: 401 })
-  }
-
-  const payload = await decrypt(session)
-
-  if (!payload) {
-    return Response.json({ message: "Invalid session" }, { status: 401 })
+  if (error) {
+    return error
   }
 
   const body = await req.json()
@@ -34,12 +27,11 @@ export async function POST(req: Request) {
     return Response.json({ message: schema.error.flatten() }, { status: 400 })
   }
 
-  const { id } = payload
   const { fullName, phone, shippingAddr, city, state, postalCode, notes } = schema.data
 
   const cartItems = await prisma.cartItem.findMany({
     where: {
-      userId: id as string,
+      userId: user.id,
       book: {
         isActive: true,
         store: { isActive: true }
@@ -65,11 +57,14 @@ export async function POST(req: Request) {
     (sum, item) => sum + item.quantity * Number(item.book.price), 0
   )
 
+  const deliveryCode = String(randomInt(100000, 1000000))
+
   const order = await prisma.order.create({
     data: {
-      buyerId: id as string,
+      buyerId: user.id,
       fullName,
       totalAmount: total,
+      deliveryCode,
       phone,
       shippingAddr,
       city,
@@ -99,11 +94,15 @@ export async function POST(req: Request) {
   }
 
   await prisma.cartItem.deleteMany({
-    where: { userId: id as string }
+    where: { userId: user.id }
   })
 
   return Response.json({
     message: "Order created successfully",
-    order
+    order: {
+      ...order,
+      deliveryCode,
+    },
+    deliveryCode,
   }, { status: 201 })
 }

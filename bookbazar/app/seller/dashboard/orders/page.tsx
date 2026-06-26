@@ -8,11 +8,14 @@ const ORDER_STATUSES = [
   "PENDING",
   "CONFIRMED",
   "SHIPPED",
-  "DELIVERED",
-  "CANCELLED",
 ] as const;
 
-type OrderStatus = (typeof ORDER_STATUSES)[number];
+type OrderStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED";
 
 interface SellerOrder {
   id: string;
@@ -55,6 +58,7 @@ export default function SellerOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deliveryCodes, setDeliveryCodes] = useState<Record<string, string>>({});
 
   useEffect(() => {
     async function loadOrders() {
@@ -91,17 +95,27 @@ export default function SellerOrdersPage() {
     );
   }, [orders]);
 
-  async function updateStatus(orderId: string, status: OrderStatus) {
+  async function updateStatus(orderId: string, status: OrderStatus, deliveryCode?: string) {
     setUpdatingId(orderId);
     setError("");
 
     try {
-      await axios.patch(`/api/seller/orders/${orderId}`, { status });
+      await axios.patch(`/api/seller/orders/${orderId}`, {
+        status,
+        deliveryCode,
+      });
       setOrders((current) =>
         current.map((order) =>
           order.id === orderId ? { ...order, status } : order
         )
       );
+      if (status === "DELIVERED") {
+        setDeliveryCodes((current) => {
+          const next = { ...current };
+          delete next[orderId];
+          return next;
+        });
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || "Unable to update status");
@@ -224,28 +238,57 @@ export default function SellerOrdersPage() {
                       </p>
                     </div>
 
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                      <label
-                        htmlFor={`status-${order.id}`}
-                        className="text-sm font-semibold text-slate-600"
-                      >
-                        Status
-                      </label>
-                      <select
-                        id={`status-${order.id}`}
-                        value={order.status}
-                        disabled={updatingId === order.id}
-                        onChange={(e) =>
-                          updateStatus(order.id, e.target.value as OrderStatus)
-                        }
-                        className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 font-semibold text-slate-800 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:bg-slate-100"
-                      >
-                        {ORDER_STATUSES.map((status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ))}
-                      </select>
+                    <div className="flex flex-col gap-3 sm:min-w-[320px]">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <label
+                          htmlFor={`status-${order.id}`}
+                          className="text-sm font-semibold text-slate-600"
+                        >
+                          Status
+                        </label>
+                        <select
+                          id={`status-${order.id}`}
+                          value={order.status}
+                          disabled={updatingId === order.id}
+                          onChange={(e) =>
+                            updateStatus(order.id, e.target.value as OrderStatus)
+                          }
+                          className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 font-semibold text-slate-800 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+                        >
+                          {ORDER_STATUSES.map((status) => (
+                            <option key={status} value={status}>
+                              {status}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:flex-row sm:items-center">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={6}
+                          value={deliveryCodes[order.id] || ""}
+                          onChange={(e) =>
+                            setDeliveryCodes((current) => ({
+                              ...current,
+                              [order.id]: e.target.value.replace(/\D/g, "").slice(0, 6),
+                            }))
+                          }
+                          placeholder="Delivery code"
+                          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                        />
+                        <button
+                          type="button"
+                          disabled={updatingId === order.id}
+                          onClick={() =>
+                            updateStatus(order.id, "DELIVERED", deliveryCodes[order.id])
+                          }
+                          className="rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Mark Delivered
+                        </button>
+                      </div>
                     </div>
                   </div>
 

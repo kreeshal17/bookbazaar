@@ -28,11 +28,24 @@ export async function POST(req: NextRequest) {
   }
 
   const user = await prisma.user.findUnique({
-    where: { email: result.data.email }
+    where: { email: result.data.email },
+    select: {
+      id: true,
+      email: true,
+      full_name: true,
+      password_hash: true,
+      role: true,
+      isVerified: true,
+      isBlocked: true,
+    }
   })
 
   if (!user) {
     return Response.json({ message: "No user found" }, { status: 404 })
+  }
+
+  if (user.isBlocked) {
+    return Response.json({ message: "Your account is blocked. Contact support." }, { status: 403 })
   }
 
   if (!user.isVerified) {
@@ -63,7 +76,7 @@ export async function POST(req: NextRequest) {
     if (newCount === 1) {
       await redis.expire(`login:${result.data.email}`, 900)
     }
-    return Response.json({ message: "Invalid email or password" }, { status: 401 })
+    return Response.json({ message: "Wrong password" }, { status: 401 })
   }
 
   const store = await prisma.store.findUnique({

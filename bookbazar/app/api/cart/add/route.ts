@@ -1,6 +1,7 @@
 import { decrypt } from "@/app/lib/session"
 import { cookies } from "next/headers"
 import prisma from "@/lib/prisma"
+import { requireActiveUser } from "@/app/lib/active-user"
 export async function POST(req:Request)
 {
 
@@ -32,6 +33,12 @@ const payload=await decrypt(session)
       status: 401
     }
   )
+}
+
+const { error } = await requireActiveUser()
+
+if (error) {
+  return error
 }
 
     const {id}=payload

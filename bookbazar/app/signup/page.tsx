@@ -13,6 +13,8 @@ export default function Signup() {
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [role, setRole] = useState('')
 
   const [loading, setLoading] = useState(false)
@@ -72,7 +74,7 @@ export default function Signup() {
       })
 
       setIsError(false)
-      setMessage(response.data.message)
+      setMessage('Signup successful. Please check your email for verification. It may be in Spam or Promotions.')
 
       setTimeout(() => {
         router.push('/login')
@@ -92,7 +94,7 @@ export default function Signup() {
   <div className="min-h-screen flex bg-slate-50">
 
     {/* LEFT FORM */}
-    <div className="w-full lg:w-[100%] flex items-center justify-center px-8 py-10">
+    <div className="w-full lg:w-full flex items-center justify-center px-8 py-10">
       <div className="w-full max-w-md">
 
         <div className="mb-8">
@@ -143,21 +145,65 @@ export default function Signup() {
               <option value="SELLER">Seller</option>
             </select>
 
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 p-3 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-xl border border-slate-300 p-3 pr-12 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((current) => !current)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute inset-y-0 right-3 flex items-center text-slate-500 transition hover:text-indigo-600"
+              >
+                {showPassword ? (
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 3l18 18" />
+                    <path d="M10.58 10.58A2 2 0 0 0 12 15a2 2 0 0 0 1.42-.58" />
+                    <path d="M9.88 5.09A10.94 10.94 0 0 1 12 5c5.5 0 9.5 7 9.5 7a20.23 20.23 0 0 1-4.1 4.6" />
+                    <path d="M6.61 6.61C3.85 8.7 2.5 12 2.5 12s2.5 7 9.5 7c1.56 0 2.96-.28 4.18-.74" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
 
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 p-3 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Confirm Password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                className="w-full rounded-xl border border-slate-300 p-3 pr-12 text-slate-900 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((current) => !current)}
+                aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                className="absolute inset-y-0 right-3 flex items-center text-slate-500 transition hover:text-indigo-600"
+              >
+                {showConfirmPassword ? (
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 3l18 18" />
+                    <path d="M10.58 10.58A2 2 0 0 0 12 15a2 2 0 0 0 1.42-.58" />
+                    <path d="M9.88 5.09A10.94 10.94 0 0 1 12 5c5.5 0 9.5 7 9.5 7a20.23 20.23 0 0 1-4.1 4.6" />
+                    <path d="M6.61 6.61C3.85 8.7 2.5 12 2.5 12s2.5 7 9.5 7c1.56 0 2.96-.28 4.18-.74" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
 
             {message && (
               <div
@@ -212,7 +258,7 @@ export default function Signup() {
 
     {/* RIGHT BOOKMANDU */}
     
-<div className="hidden lg:flex lg:w-[58%] relative overflow-hidden bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900">
+<div className="hidden lg:flex lg:w-[58%] relative overflow-hidden bg-linear-to-br from-indigo-700 via-indigo-800 to-slate-900">
 
       <div className="absolute top-20 left-20 h-72 w-72 rounded-full bg-indigo-400/20 blur-3xl" />
       <div className="absolute bottom-20 right-20 h-72 w-72 rounded-full bg-purple-400/20 blur-3xl" />
@@ -230,7 +276,7 @@ export default function Signup() {
         <div className="mt-8 space-y-3">
           
           {/* Sleek & Compact Voucher Banner */}
-          <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 px-4 py-3 shadow-lg border border-pink-400/20">
+          <div className="relative overflow-hidden rounded-xl bg-linear-to-r from-pink-500 to-rose-600 px-4 py-3 shadow-lg border border-pink-400/20">
             {/* Left & Right Voucher Punch-Holes matching background */}
             <div className="absolute -left-2 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-[#3c3682]" />
             <div className="absolute -right-2 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-[#1b1c41]" />
