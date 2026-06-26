@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Image from "next/image";
 
 interface PendingSeller {
@@ -102,7 +102,7 @@ type SectionKey =
   | "reviews"
   | "messages";
 
-const NAV_ITEMS: { key: SectionKey; label: string; icon: JSX.Element }[] = [
+const NAV_ITEMS: { key: SectionKey; label: string; icon: ReactNode }[] = [
   {
     key: "overview",
     label: "Dashboard Overview",
