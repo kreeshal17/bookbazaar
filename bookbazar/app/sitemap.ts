@@ -4,15 +4,34 @@ import prisma from "@/lib/prisma";
 const SITE_URL = "https://www.bookmandu.vercel.app";
 
 const staticRoutes = [
-  "",
-  "/books",
-  "/categories",
-  "/category",
-  "/help",
+  {
+    route: "",
+    changeFrequency: "daily" as const,
+    priority: 1,
+  },
+  {
+    route: "/books",
+    changeFrequency: "weekly" as const,
+    priority: 0.9,
+  },
+  {
+    route: "/categories",
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  },
+  {
+    route: "/category",
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  },
+  {
+    route: "/help",
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const lastModified = new Date();
   const books = await prisma.book.findMany({
     where: {
       isActive: true,
@@ -27,12 +46,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
 
   return [
-    ...staticRoutes.map((route) => ({
-    url: `${SITE_URL}${route}`,
-    lastModified,
-    changeFrequency: route === "" ? "daily" : "weekly",
-    priority: route === "" ? 1 : 0.7,
+    ...staticRoutes.map((item) => ({
+      url: `${SITE_URL}${item.route}`,
+      lastModified: new Date(),
+      changeFrequency: item.changeFrequency,
+      priority: item.priority,
     })),
+
     ...books.map((book) => ({
       url: `${SITE_URL}/books/${book.slug}`,
       lastModified: book.updatedAt,
