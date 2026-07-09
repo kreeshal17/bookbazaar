@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { trackEvent } from "@/lib/analytics";
 
 interface book {
   id: string
@@ -71,6 +72,18 @@ export default function checkout() {
       }
     );
 
+      trackEvent("purchase", {
+        transaction_id: response.data.order?.id,
+        currency: "NPR",
+        value: total,
+        items: books.map((item) => ({
+          item_id: item.id,
+          item_name: item.book.title,
+          price: item.book.price,
+          quantity: item.quantity,
+        })),
+      })
+
     alert(`Order placed successfully. Your delivery code is ${response.data.deliveryCode}. Share it with the seller only after receiving the product.`);
     router.push("/orders");
   } catch (error) {
@@ -96,6 +109,23 @@ export default function checkout() {
   }, [])
 
   const total = books.reduce((sum, items) => sum + items.quantity * items.book.price, 0)
+
+  useEffect(() => {
+    if (books.length === 0) {
+      return;
+    }
+
+    trackEvent("begin_checkout", {
+      currency: "NPR",
+      value: total,
+      items: books.map((item) => ({
+        item_id: item.id,
+        item_name: item.book.title,
+        price: item.book.price,
+        quantity: item.quantity,
+      })),
+    })
+  }, [books, total])
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4 md:py-12 md:px-6">

@@ -42,6 +42,7 @@ export type BookMinAggregateOutputType = {
   id: string | null
   storeId: string | null
   categoryId: string | null
+  slug: string | null
   title: string | null
   description: string | null
   author: string | null
@@ -60,6 +61,7 @@ export type BookMaxAggregateOutputType = {
   id: string | null
   storeId: string | null
   categoryId: string | null
+  slug: string | null
   title: string | null
   description: string | null
   author: string | null
@@ -78,6 +80,7 @@ export type BookCountAggregateOutputType = {
   id: number
   storeId: number
   categoryId: number
+  slug: number
   title: number
   description: number
   author: number
@@ -110,6 +113,7 @@ export type BookMinAggregateInputType = {
   id?: true
   storeId?: true
   categoryId?: true
+  slug?: true
   title?: true
   description?: true
   author?: true
@@ -128,6 +132,7 @@ export type BookMaxAggregateInputType = {
   id?: true
   storeId?: true
   categoryId?: true
+  slug?: true
   title?: true
   description?: true
   author?: true
@@ -146,6 +151,7 @@ export type BookCountAggregateInputType = {
   id?: true
   storeId?: true
   categoryId?: true
+  slug?: true
   title?: true
   description?: true
   author?: true
@@ -251,6 +257,7 @@ export type BookGroupByOutputType = {
   id: string
   storeId: string
   categoryId: string | null
+  slug: string
   title: string
   description: string | null
   author: string | null
@@ -292,6 +299,7 @@ export type BookWhereInput = {
   id?: Prisma.StringFilter<"Book"> | string
   storeId?: Prisma.StringFilter<"Book"> | string
   categoryId?: Prisma.StringNullableFilter<"Book"> | string | null
+  slug?: Prisma.StringFilter<"Book"> | string
   title?: Prisma.StringFilter<"Book"> | string
   description?: Prisma.StringNullableFilter<"Book"> | string | null
   author?: Prisma.StringNullableFilter<"Book"> | string | null
@@ -315,6 +323,7 @@ export type BookOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   storeId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
+  slug?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   author?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -336,6 +345,7 @@ export type BookOrderByWithRelationInput = {
 
 export type BookWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  slug?: string
   isbn?: string
   AND?: Prisma.BookWhereInput | Prisma.BookWhereInput[]
   OR?: Prisma.BookWhereInput[]
@@ -358,12 +368,13 @@ export type BookWhereUniqueInput = Prisma.AtLeast<{
   orderItems?: Prisma.OrderItemListRelationFilter
   cartItems?: Prisma.CartItemListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
-}, "id" | "isbn">
+}, "id" | "slug" | "isbn">
 
 export type BookOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   storeId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
+  slug?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   author?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -390,6 +401,7 @@ export type BookScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Book"> | string
   storeId?: Prisma.StringWithAggregatesFilter<"Book"> | string
   categoryId?: Prisma.StringNullableWithAggregatesFilter<"Book"> | string | null
+  slug?: Prisma.StringWithAggregatesFilter<"Book"> | string
   title?: Prisma.StringWithAggregatesFilter<"Book"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Book"> | string | null
   author?: Prisma.StringNullableWithAggregatesFilter<"Book"> | string | null
@@ -406,6 +418,7 @@ export type BookScalarWhereWithAggregatesInput = {
 
 export type BookCreateInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -429,6 +442,7 @@ export type BookUncheckedCreateInput = {
   id?: string
   storeId: string
   categoryId?: string | null
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -448,6 +462,7 @@ export type BookUncheckedCreateInput = {
 
 export type BookUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -471,6 +486,7 @@ export type BookUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   storeId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -492,6 +508,7 @@ export type BookCreateManyInput = {
   id?: string
   storeId: string
   categoryId?: string | null
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -508,6 +525,7 @@ export type BookCreateManyInput = {
 
 export type BookUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -526,6 +544,7 @@ export type BookUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   storeId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -554,6 +573,7 @@ export type BookCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   storeId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   author?: Prisma.SortOrder
@@ -578,6 +598,7 @@ export type BookMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   storeId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   author?: Prisma.SortOrder
@@ -596,6 +617,7 @@ export type BookMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   storeId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   author?: Prisma.SortOrder
@@ -777,6 +799,7 @@ export type BookUpdateOneRequiredWithoutReviewsNestedInput = {
 
 export type BookCreateWithoutStoreInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -798,6 +821,7 @@ export type BookCreateWithoutStoreInput = {
 export type BookUncheckedCreateWithoutStoreInput = {
   id?: string
   categoryId?: string | null
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -848,6 +872,7 @@ export type BookScalarWhereInput = {
   id?: Prisma.StringFilter<"Book"> | string
   storeId?: Prisma.StringFilter<"Book"> | string
   categoryId?: Prisma.StringNullableFilter<"Book"> | string | null
+  slug?: Prisma.StringFilter<"Book"> | string
   title?: Prisma.StringFilter<"Book"> | string
   description?: Prisma.StringNullableFilter<"Book"> | string | null
   author?: Prisma.StringNullableFilter<"Book"> | string | null
@@ -864,6 +889,7 @@ export type BookScalarWhereInput = {
 
 export type BookCreateWithoutCategoryInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -885,6 +911,7 @@ export type BookCreateWithoutCategoryInput = {
 export type BookUncheckedCreateWithoutCategoryInput = {
   id?: string
   storeId: string
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -930,6 +957,7 @@ export type BookUpdateManyWithWhereWithoutCategoryInput = {
 
 export type BookCreateWithoutOrderItemsInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -952,6 +980,7 @@ export type BookUncheckedCreateWithoutOrderItemsInput = {
   id?: string
   storeId: string
   categoryId?: string | null
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -986,6 +1015,7 @@ export type BookUpdateToOneWithWhereWithoutOrderItemsInput = {
 
 export type BookUpdateWithoutOrderItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1008,6 +1038,7 @@ export type BookUncheckedUpdateWithoutOrderItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   storeId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1026,6 +1057,7 @@ export type BookUncheckedUpdateWithoutOrderItemsInput = {
 
 export type BookCreateWithoutCartItemsInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -1048,6 +1080,7 @@ export type BookUncheckedCreateWithoutCartItemsInput = {
   id?: string
   storeId: string
   categoryId?: string | null
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -1082,6 +1115,7 @@ export type BookUpdateToOneWithWhereWithoutCartItemsInput = {
 
 export type BookUpdateWithoutCartItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1104,6 +1138,7 @@ export type BookUncheckedUpdateWithoutCartItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   storeId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1122,6 +1157,7 @@ export type BookUncheckedUpdateWithoutCartItemsInput = {
 
 export type BookCreateWithoutReviewsInput = {
   id?: string
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -1144,6 +1180,7 @@ export type BookUncheckedCreateWithoutReviewsInput = {
   id?: string
   storeId: string
   categoryId?: string | null
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -1178,6 +1215,7 @@ export type BookUpdateToOneWithWhereWithoutReviewsInput = {
 
 export type BookUpdateWithoutReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1200,6 +1238,7 @@ export type BookUncheckedUpdateWithoutReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   storeId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1219,6 +1258,7 @@ export type BookUncheckedUpdateWithoutReviewsInput = {
 export type BookCreateManyStoreInput = {
   id?: string
   categoryId?: string | null
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -1235,6 +1275,7 @@ export type BookCreateManyStoreInput = {
 
 export type BookUpdateWithoutStoreInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1256,6 +1297,7 @@ export type BookUpdateWithoutStoreInput = {
 export type BookUncheckedUpdateWithoutStoreInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1276,6 +1318,7 @@ export type BookUncheckedUpdateWithoutStoreInput = {
 export type BookUncheckedUpdateManyWithoutStoreInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1293,6 +1336,7 @@ export type BookUncheckedUpdateManyWithoutStoreInput = {
 export type BookCreateManyCategoryInput = {
   id?: string
   storeId: string
+  slug: string
   title: string
   description?: string | null
   author?: string | null
@@ -1309,6 +1353,7 @@ export type BookCreateManyCategoryInput = {
 
 export type BookUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1330,6 +1375,7 @@ export type BookUpdateWithoutCategoryInput = {
 export type BookUncheckedUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1350,6 +1396,7 @@ export type BookUncheckedUpdateWithoutCategoryInput = {
 export type BookUncheckedUpdateManyWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   storeId?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   author?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1417,6 +1464,7 @@ export type BookSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   storeId?: boolean
   categoryId?: boolean
+  slug?: boolean
   title?: boolean
   description?: boolean
   author?: boolean
@@ -1441,6 +1489,7 @@ export type BookSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   storeId?: boolean
   categoryId?: boolean
+  slug?: boolean
   title?: boolean
   description?: boolean
   author?: boolean
@@ -1461,6 +1510,7 @@ export type BookSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   storeId?: boolean
   categoryId?: boolean
+  slug?: boolean
   title?: boolean
   description?: boolean
   author?: boolean
@@ -1481,6 +1531,7 @@ export type BookSelectScalar = {
   id?: boolean
   storeId?: boolean
   categoryId?: boolean
+  slug?: boolean
   title?: boolean
   description?: boolean
   author?: boolean
@@ -1495,7 +1546,7 @@ export type BookSelectScalar = {
   updatedAt?: boolean
 }
 
-export type BookOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "storeId" | "categoryId" | "title" | "description" | "author" | "isbn" | "price" | "originalPrice" | "stockQty" | "imageUrl" | "condition" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["book"]>
+export type BookOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "storeId" | "categoryId" | "slug" | "title" | "description" | "author" | "isbn" | "price" | "originalPrice" | "stockQty" | "imageUrl" | "condition" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["book"]>
 export type BookInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   store?: boolean | Prisma.StoreDefaultArgs<ExtArgs>
   category?: boolean | Prisma.Book$categoryArgs<ExtArgs>
@@ -1526,6 +1577,7 @@ export type $BookPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     storeId: string
     categoryId: string | null
+    slug: string
     title: string
     description: string | null
     author: string | null
@@ -1969,6 +2021,7 @@ export interface BookFieldRefs {
   readonly id: Prisma.FieldRef<"Book", 'String'>
   readonly storeId: Prisma.FieldRef<"Book", 'String'>
   readonly categoryId: Prisma.FieldRef<"Book", 'String'>
+  readonly slug: Prisma.FieldRef<"Book", 'String'>
   readonly title: Prisma.FieldRef<"Book", 'String'>
   readonly description: Prisma.FieldRef<"Book", 'String'>
   readonly author: Prisma.FieldRef<"Book", 'String'>

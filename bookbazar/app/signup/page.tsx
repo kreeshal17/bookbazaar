@@ -4,6 +4,7 @@ import axios from 'axios'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { trackEvent } from "@/lib/analytics"
 
 export default function Signup() {
   const router = useRouter()
@@ -75,6 +76,11 @@ export default function Signup() {
 
       setIsError(false)
       setMessage('Signup successful. Please check your email for verification. It may be in Spam or Promotions.')
+
+      trackEvent("sign_up", {
+        method: "password",
+        user_role: role,
+      })
 
       setTimeout(() => {
         router.push('/login')

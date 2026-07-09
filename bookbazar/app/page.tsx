@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import Footer from '@/components/home/footer';
 import Hero from '@/components/home/hero';
 import Feature from '@/components/home/featuresbook';
 import Navbar from '@/components/Navbar';
 import ChatBot from './chat/page';
-
-const SITE_URL = "https://www.bookmandu.vercel.app";
-const SITE_NAME = "BookMandu";
-const SITE_DESCRIPTION =
-  "BookMandu is Nepal's online book marketplace to buy and sell new or used books. Discover textbooks, novels, comics, self-help books, and more with trusted sellers.";
+import { getCanonicalUrl, SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: {
@@ -17,7 +14,7 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   alternates: {
-    canonical: SITE_URL,
+    canonical: getCanonicalUrl("/"),
   },
   openGraph: {
     title: `${SITE_NAME} | Buy & Sell Books Online in Nepal`,
@@ -43,7 +40,7 @@ export const metadata: Metadata = {
   },
 };
 
-const structuredData = {
+const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: SITE_NAME,
@@ -52,13 +49,24 @@ const structuredData = {
   sameAs: [],
 };
 
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE_NAME,
+  url: SITE_URL,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${SITE_URL}/books?search={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
+
 export default function Page() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <Script id="home-jsonld" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify([organizationSchema, websiteSchema])}
+      </Script>
       <Navbar />
       <Hero />
       <ChatBot />

@@ -1,5 +1,6 @@
 import { decrypt } from "@/app/lib/session";
 import prisma from "@/lib/prisma";
+import { generateUniqueSlug } from "@/lib/slug";
 import { cookies } from "next/headers";
 import {z} from "zod"
 
@@ -98,6 +99,7 @@ if (!result.success) {
 
 const data=result.data
 const categoryId = await getCategoryId(data.categoryId);
+const slug = await generateUniqueSlug(data.title);
 
 const sessionCookie= cookieStore.get("session")?.value
 if (!sessionCookie) {
@@ -139,6 +141,7 @@ const book=await prisma.book.create({
     data:{
 
           storeId:store.id,
+      slug,
           title:data.title,
           description:data.description,
           author:data.author,

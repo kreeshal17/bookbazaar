@@ -3,6 +3,7 @@ import axios from "axios"
 import { useState } from "react"
 import Link  from "next/link"
 import { useRouter } from "next/navigation"
+import { trackEvent } from "@/lib/analytics"
 export default function Login() {
 
   const [email, setEmail] = useState("")
@@ -22,10 +23,12 @@ async function handleForm(e: React.FormEvent<HTMLFormElement>) {
       })
 
       if(response.data.role == "ADMIN") {
+        trackEvent("login", { method: "password", user_role: response.data.role })
         router.push("/admin")
       }
 
       if (response.data.role === "SELLER") {
+        trackEvent("login", { method: "password", user_role: response.data.role })
         if (response.data.hasStore) {
           router.push("/seller/dashboard")
         } else {
@@ -34,6 +37,7 @@ async function handleForm(e: React.FormEvent<HTMLFormElement>) {
       }
 
       if (response.data.role === "BUYER") {
+        trackEvent("login", { method: "password", user_role: response.data.role })
         router.push("/")
       }
 

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 
 interface Book {
   id: string
+  slug: string
   title: string
   author: string | null
   description: string | null
@@ -81,7 +82,7 @@ export default function Feature() {
                   className="group relative flex flex-col h-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
                 >
                   {/* Book Cover */}
-                  <div className="relative h-72 w-full overflow-hidden bg-gradient-to-br from-indigo-100 to-indigo-200">
+                  <div className="relative h-72 w-full overflow-hidden bg-linear-to-br from-indigo-100 to-indigo-200">
                     {b.imageUrl ? (
                       <Image
                         src={b.imageUrl}
@@ -118,7 +119,7 @@ export default function Feature() {
                       By {b.author || "Unknown Author"}
                     </p>
 
-                    <p className="mt-3 text-sm text-slate-600 line-clamp-2 flex-grow">
+                    <p className="mt-3 text-sm text-slate-600 line-clamp-2 grow">
                       {b.description || "No description available."}
                     </p>
 
@@ -140,7 +141,7 @@ export default function Feature() {
                       </div>
 
                       <Link
-                        href={`/books/${b.id}`}
+                        href={`/books/${b.slug}`}
                         className="block w-full text-center py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
                       >
                         View Details

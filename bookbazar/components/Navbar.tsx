@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useEffect, useState } from 'react'
+import { trackEvent } from '@/lib/analytics'
 
 export default function Navbar() {
   const [user, setUser] = useState<{ email: string } | null>(null)
@@ -24,6 +25,10 @@ export default function Navbar() {
       router.push("/books")
       return
     }
+
+    trackEvent("search", {
+      search_term: query,
+    })
 
     router.push(`/books?search=${encodeURIComponent(query)}`)
   }

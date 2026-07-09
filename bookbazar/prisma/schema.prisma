@@ -89,6 +89,7 @@ model Book {
   id             String        @id @default(uuid())
   storeId        String
   categoryId     String?
+  slug           String        @unique
   title          String
   description    String?
   author         String?

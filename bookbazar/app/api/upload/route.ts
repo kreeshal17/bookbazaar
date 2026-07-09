@@ -7,25 +7,33 @@ cloudinary.config({
 });
 
 export async function POST(req: Request) {
-  const formData = await req.formData()
-  const file = formData.get("file") as File
+  try {
+    const formData = await req.formData();
+    const file = formData.get("file") as File;
 
-  if (!file) {
-    return Response.json({ message: "No file provided" }, { status: 400 });
+    if (!file) {
+      return Response.json({ message: "No file provided" }, { status: 400 });
+    }
+
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          { folder: "bookmandu/books" },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        )
+        .end(buffer);
+    });
+
+    return Response.json({ url: (uploadResult as any).secure_url });
+
+  } catch (err) {
+    console.error("UPLOAD ERROR:", err);
+    return Response.json({ error: String(err) }, { status: 500 });
   }
-
-  const byte = await file.arrayBuffer();
-  const buffer = Buffer.from(byte);
-
-  const uploadResult = await new Promise((resolve, reject) => {
-    cloudinary.uploader.upload_stream(
-      { folder: "bookmandu/books" },
-      (error, uploadResult) => {
-        if (error) return reject(error);
-        return resolve(uploadResult);
-      }
-    ).end(buffer);
-  });
-
-  return Response.json({ url: (uploadResult as any).secure_url });
 }

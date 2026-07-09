@@ -2,7 +2,17 @@
 
 import axios from "axios"
 import { useRouter } from "next/navigation";
-export default function Addtocart({bookID}:{bookID:string})
+import { trackEvent } from "@/lib/analytics";
+
+export default function Addtocart({
+  bookID,
+  bookTitle,
+  bookPrice,
+}: {
+  bookID: string;
+  bookTitle: string;
+  bookPrice: number;
+})
 {
 
     const router=useRouter()
@@ -14,6 +24,18 @@ async function handlecart() {
     });
 
     if (result.status === 201 || result.status === 200) {
+      trackEvent("add_to_cart", {
+        currency: "NPR",
+        value: bookPrice,
+        items: [
+          {
+            item_id: bookID,
+            item_name: bookTitle,
+            price: bookPrice,
+            quantity: 1,
+          },
+        ],
+      })
       alert("Successfully added to cart");
     }
   } catch (error: any) {

@@ -129,6 +129,7 @@ export const BookScalarFieldEnum = {
   id: 'id',
   storeId: 'storeId',
   categoryId: 'categoryId',
+  slug: 'slug',
   title: 'title',
   description: 'description',
   author: 'author',

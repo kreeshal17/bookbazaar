@@ -1,23 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-
-const SITE_URL = "https://www.bookmandu.vercel.app";
-const SITE_NAME = "BookMandu";
-const SEO_DESCRIPTION =
-  "BookMandu is Nepal's trusted online book marketplace to buy and sell new or used books. Discover textbooks, novels, comics, self-help, and more at unbeatable prices. List your books and earn today!";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+import Analytics from "@/components/Analytics";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -30,7 +27,7 @@ export const metadata: Metadata = {
     shortcut: "/icon.svg",
     apple: "/icon.svg",
   },
-  description: SEO_DESCRIPTION,
+  description: SITE_DESCRIPTION,
   keywords: [
     "buy books online",
     "sell books online",
@@ -107,11 +104,13 @@ export default function RootLayout({
         "antialiased",
         geistSans.variable,
         geistMono.variable,
-        "font-sans",
-        inter.variable
+        "font-sans"
       )}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Analytics />
+        {children}
+      </body>
     </html>
   );
 }

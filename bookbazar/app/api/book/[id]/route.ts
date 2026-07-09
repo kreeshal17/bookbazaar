@@ -1,5 +1,6 @@
 import { decrypt } from "@/app/lib/session";
 import prisma from "@/lib/prisma";
+import { generateUniqueSlug } from "@/lib/slug";
 import { cookies } from "next/headers";
 import { z } from "zod";
 
@@ -116,10 +117,12 @@ export async function PATCH(
 
   const data = result.data;
   const categoryId = await getCategoryId(data.categoryId);
+  const slug = await generateUniqueSlug(data.title, id);
 
   const book = await prisma.book.update({
     where: { id },
     data: {
+      slug,
       title: data.title,
       description: data.description,
       author: data.author,

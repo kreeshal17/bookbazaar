@@ -1,6 +1,29 @@
+import type { Metadata } from "next";
 import Footer from "@/components/home/footer";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import { getCanonicalUrl, SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: `Book Categories`,
+  description: `Browse book categories on ${SITE_NAME}.`,
+  alternates: {
+    canonical: getCanonicalUrl("/categories"),
+  },
+  openGraph: {
+    title: `Book Categories | ${SITE_NAME}`,
+    description: SITE_DESCRIPTION,
+    url: getCanonicalUrl("/categories"),
+    type: "website",
+    images: ["/title.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Book Categories | ${SITE_NAME}`,
+    description: SITE_DESCRIPTION,
+    images: ["/title.png"],
+  },
+};
 
 const categories = [
   {
