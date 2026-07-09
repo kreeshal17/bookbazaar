@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -19,31 +20,50 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: SITE_NAME,
+    default: `${SITE_NAME} | Buy & Sell Books in Nepal`,
     template: `%s | ${SITE_NAME}`,
   },
-  icons: {
-    icon: "/icon.svg",
-    shortcut: "/icon.svg",
-    apple: "/icon.svg",
-  },
-  description: SITE_DESCRIPTION,
+  description:
+    "Buy and sell new & second hand books anywhere in Nepal — Kathmandu, Pokhara, Lalitpur, Bhaktapur, Biratnagar, Birgunj, and more. Nepal's trusted online book marketplace for cheap textbooks, novels & academic books.",
   keywords: [
-    "buy books online",
-    "sell books online",
-    "used books",
-    "second hand books",
-    "book marketplace",
-    "textbooks online",
-    "cheap books India",
-    "buy sell books",
-    "online bookstore",
-    "sell old books",
-    "buy old books",
-    "novels online",
-    "academic books",
+    // Nationwide
+    "buy books online Nepal",
+    "sell books online Nepal",
+    "second hand books Nepal",
+    "used books Nepal",
+    "book marketplace Nepal",
+    "online bookstore Nepal",
+    "cheap books Nepal",
+    "buy sell books Nepal",
+    "sell old books Nepal",
+    "buy old books Nepal",
+    "novels online Nepal",
+    "academic books Nepal",
+    "textbooks Nepal",
     "bookmandu",
-    "book bazaar",
+    "book bazaar Nepal",
+    "kitab kinne bechne nepal",
+    // Kathmandu
+    "second hand books Kathmandu",
+    "used books Kathmandu",
+    "buy sell books KTM",
+    "textbooks online Kathmandu",
+    // Pokhara
+    "second hand books Pokhara",
+    "used books Pokhara",
+    "buy sell books Pokhara",
+    "textbooks online Pokhara",
+    // Other major cities
+    "second hand books Lalitpur",
+    "second hand books Bhaktapur",
+    "second hand books Biratnagar",
+    "second hand books Birgunj",
+    "second hand books Dharan",
+    "second hand books Butwal",
+    "second hand books Bharatpur",
+    "second hand books Nepalgunj",
+    "second hand books Itahari",
+    "second hand books Hetauda",
   ],
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
@@ -52,29 +72,43 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   alternates: {
     canonical: SITE_URL,
+    languages: {
+      "en-NP": SITE_URL,
+    },
+  },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
+  other: {
+    "geo.region": "NP",
+    "geo.placename": "Nepal",
+    "geo.position": "28.3949;84.1240", // Nepal's geographic center
+    "ICBM": "28.3949, 84.1240",
   },
   openGraph: {
-    title: `${SITE_NAME} | Buy & Sell Books Online`,
+    title: `${SITE_NAME} | Buy & Sell Books Anywhere in Nepal`,
     description:
-      "Discover thousands of new and used books on BookMandu. Buy cheap textbooks, novels, and more or sell your old books and earn cash instantly.",
+      "Discover thousands of new and used books on BookMandu. Buy cheap textbooks, novels, and more or sell your old books and earn cash instantly — delivering across Kathmandu, Pokhara, and all of Nepal.",
     url: SITE_URL,
     siteName: SITE_NAME,
     type: "website",
-    locale: "en_IN",
+    locale: "en_NP",
     images: [
       {
         url: "/title.png",
         width: 1200,
         height: 630,
-        alt: "BookMandu - Buy & Sell Books Online",
+        alt: "BookMandu - Buy & Sell Books Online Across Nepal",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} | Buy & Sell Books Online`,
+    title: `${SITE_NAME} | Buy & Sell Books Anywhere in Nepal`,
     description:
-      "Buy and sell books easily on BookMandu. Best prices on textbooks, novels, comics, and more.",
+      "Buy and sell books easily on BookMandu. Best prices on textbooks, novels, comics, and more — Kathmandu, Pokhara & all of Nepal.",
     images: ["/title.png"],
     creator: "@bookmandu",
   },
@@ -89,6 +123,47 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+};
+
+// JSON-LD structured data — tells Google exactly which areas you serve.
+// Country-level areaServed as the primary signal, with the biggest
+// cities called out explicitly for stronger local-intent matching.
+const localBusinessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "OnlineStore",
+  name: SITE_NAME,
+  url: SITE_URL,
+  description: SITE_DESCRIPTION,
+  areaServed: [
+    {
+      "@type": "Country",
+      name: "Nepal",
+    },
+    { "@type": "City", name: "Kathmandu" },
+    { "@type": "City", name: "Pokhara" },
+    { "@type": "City", name: "Lalitpur" },
+    { "@type": "City", name: "Bhaktapur" },
+    { "@type": "City", name: "Biratnagar" },
+    { "@type": "City", name: "Birgunj" },
+    { "@type": "City", name: "Dharan" },
+    { "@type": "City", name: "Butwal" },
+    { "@type": "City", name: "Bharatpur" },
+    { "@type": "City", name: "Nepalgunj" },
+  ],
+  address: {
+    "@type": "PostalAddress",
+    addressCountry: "NP",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 28.3949,
+    longitude: 84.124,
+  },
+  sameAs: [
+    // add real social links, e.g.
+    // "https://www.facebook.com/bookmandu",
+    // "https://www.instagram.com/bookmandu",
+  ],
 };
 
 export default function RootLayout({
@@ -107,9 +182,20 @@ export default function RootLayout({
         "font-sans"
       )}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(localBusinessJsonLd),
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
-        <Analytics />
         {children}
+        <Suspense fallback={null}>
+          <Analytics />
+        </Suspense>
       </body>
     </html>
   );
