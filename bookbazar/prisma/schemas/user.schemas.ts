@@ -17,6 +17,6 @@ export const userSchema = z.object({
     .min(8, "Password must be at least 8 characters"),
 
   role: z
-    .enum(["ADMIN","BUYER","SELLER"])
+    .enum(["BUYER","SELLER"])
     .default("BUYER"),
 });
