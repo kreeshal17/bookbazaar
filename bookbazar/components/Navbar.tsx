@@ -149,7 +149,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav links */}
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-1 lg:flex">
           {NAV_LINKS.map((link) => (
             <Link key={link.href} href={link.href} className="rounded-md px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors">
               {link.label}
@@ -163,7 +163,7 @@ export default function Navbar() {
         </nav>
 
         {/* Search — desktop only; mobile search lives in the drawer */}
-        <form onSubmit={handleSearch} className="relative hidden min-w-0 flex-1 items-center md:flex md:max-w-md">
+        <form onSubmit={handleSearch} className="relative hidden min-w-0 flex-1 items-center lg:flex lg:max-w-md">
           <input
             type="search"
             value={search}
@@ -186,7 +186,7 @@ export default function Navbar() {
         <div className="ml-auto flex shrink-0 items-center gap-2">
           {/* Desktop actions */}
           {!user ? (
-            <div className="hidden items-center gap-2 md:flex">
+            <div className="hidden items-center gap-2 lg:flex">
               <Link href="/login" className="rounded-md border border-slate-200 px-4 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
                 Login
               </Link>
@@ -195,7 +195,7 @@ export default function Navbar() {
               </Link>
             </div>
           ) : (
-            <div className="hidden items-center gap-1 md:flex">
+            <div className="hidden items-center gap-1 lg:flex">
               <Link href="/orders" className="rounded-md px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors">
                 My orders
               </Link>
@@ -280,7 +280,7 @@ export default function Navbar() {
           )}
 
           {/* Mobile: quick wishlist/cart icons + hamburger */}
-          <div className="flex items-center gap-1 md:hidden">
+          <div className="flex items-center gap-1 lg:hidden">
             {user && (
               <>
                 <Link href="/wishlist" aria-label="Wishlist" className="relative flex h-9 w-9 items-center justify-center rounded-full text-rose-600">
@@ -315,7 +315,7 @@ export default function Navbar() {
         children, which was collapsing this drawer down to the header's own
         ~60px height instead of the full viewport. */}
     {drawerOpen && (
-        <div className="fixed inset-0 z-60 md:hidden">
+        <div className="fixed inset-0 z-60 lg:hidden">
           <button
             aria-label="Close menu"
             onClick={() => setDrawerOpen(false)}
