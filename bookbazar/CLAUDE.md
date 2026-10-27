@@ -22,6 +22,7 @@ npm run dev               # dev server
 npm run lint              # eslint
 npm run test:unit         # fast, no Docker
 npm run test:docker       # start Postgres+Redis containers, run all tests
+npm run test:e2e          # Playwright browser tests (UI/layout changes need one in tests/e2e/)
 npm run test:db:down      # stop/wipe test containers
 npx vitest run --project integration <file-substring>   # one integration file
 ```

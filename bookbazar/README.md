@@ -118,6 +118,7 @@ Create `bookbazar/.env`. It is ignored by git.
 | `npm test` | Unit + integration tests (the test containers must be running) |
 | `npm run test:docker` | Start the test containers, then run every test |
 | `npm run test:unit` | Unit tests only. No Docker needed |
+| `npm run test:e2e` | Playwright browser tests (layout checks). Starts its own dev server on port 3100 |
 | `npm run test:integration` | Integration tests only |
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run test:db:up` / `test:db:down` | Start or stop and wipe the test Postgres + Redis |
@@ -345,10 +346,12 @@ The suite uses **Vitest**. It calls the real route handlers directly, with no HT
 ```bash
 npm run test:docker    # start Postgres 16 + Redis 7 in Docker, then run everything
 npm run test:unit      # pure logic only, no Docker
+npm run test:e2e       # browser tests (first time: npx playwright install chromium)
 npm run test:db:down   # stop the containers and delete their data
 ```
 
 - **Unit** tests (`tests/unit/`) cover the session JWT, middleware, zod schemas, coupon/credit/payout arithmetic, and small helpers.
+- **Browser** tests (`tests/e2e/`, Playwright) cover things only a real layout engine can check. `navbar.spec.ts` measures every top-bar item for overlap and wrapping across roles and screen widths (375–1920px). Specs mock the APIs they need with `page.route()`, and the dev server runs with the test-only env.
 - **Integration** tests (`tests/integration/`) run every API feature area against a real Postgres (with `pg_trgm`) and Redis from `docker-compose.test.yml`, on host ports **54329** and **63799**. Each run creates a new database in that container and builds it with `prisma migrate deploy`; `test:db:down` deletes them all. `schema-drift.test.ts` fails if `schema.prisma` has changes without a migration.
 - **Mocked:** `next/headers` cookies (use `loginAs(user)` from `tests/helpers/auth.ts`), Resend (no real email is sent), Cloudinary, and Gemini.
 - **Safety:** `tests/setup/local-url.ts` refuses to run if the database or Redis URL isn't local, so the suite can never touch the real `.env` services.
