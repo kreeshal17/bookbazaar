@@ -1,0 +1,34 @@
+# Throwaway Postgres + Redis for the integration test suite.
+# Non-default host ports (54329 / 63799) so it never collides with a
+# Postgres/Redis you already run locally. Data lives in tmpfs — every
+# `down` wipes it, nothing touches Neon/Upstash.
+#
+#   npm run test:db:up     # start (waits until healthy)
+#   npm test               # run unit + integration tests
+#   npm run test:db:down   # stop and delete everything
+services:
+  postgres-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bookbazaar
+      POSTGRES_PASSWORD: bookbazaar
+      POSTGRES_DB: bookbazaar_test
+    ports:
+      - "54329:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookbazaar -d bookbazaar_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  redis-test:
+    image: redis:7-alpine
+    ports:
+      - "63799:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
