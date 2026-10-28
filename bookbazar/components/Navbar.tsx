@@ -127,16 +127,21 @@ export default function Navbar() {
   const firstName = user?.full_name?.trim()?.split(/\s+/)[0] || user?.email?.split('@')[0] || ""
   const avatarLabel = (user?.full_name?.trim()?.slice(0, 1) || user?.email?.slice(0, 1) || "?").toUpperCase()
 
-  const contributorLinks = user && user.role !== "ADMIN" ? (
-    <>
-      <Link href="/become-contributor" onClick={() => setDrawerOpen(false)} className="rounded-md px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition-colors">
-        Become a Contributor
-      </Link>
-      <Link href="/contributor/dashboard" onClick={() => setDrawerOpen(false)} className="rounded-md px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition-colors">
-        My Contributions
-      </Link>
-    </>
-  ) : null
+  // Per-account links. On desktop they live in the user dropdown, not the
+  // top bar — four extra text links there pushed the bar past its width
+  // after login and made the main nav links wrap into each other.
+  const accountLinks = user
+    ? [
+        { href: "/orders", label: "My orders" },
+        ...(user.role === "BUYER" ? [{ href: "/become-seller", label: "Become a Seller" }] : []),
+        ...(user.role !== "ADMIN"
+          ? [
+              { href: "/become-contributor", label: "Become a Contributor" },
+              { href: "/contributor/dashboard", label: "My Contributions" },
+            ]
+          : []),
+      ]
+    : []
 
   return (
     <>
@@ -149,14 +154,14 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav links */}
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden shrink-0 items-center gap-1 lg:flex">
           {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} className="rounded-md px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors">
+            <Link key={link.href} href={link.href} className="whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors xl:px-3">
               {link.label}
             </Link>
           ))}
           {!user && (
-            <Link href="/signup" className="rounded-md px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors">
+            <Link href="/signup" className="whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors xl:px-3">
               Become a seller
             </Link>
           )}
@@ -196,18 +201,6 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="hidden items-center gap-1 lg:flex">
-              <Link href="/orders" className="rounded-md px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors">
-                My orders
-              </Link>
-              {user.role === "BUYER" && (
-                <Link href="/become-seller" className="rounded-md px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors">
-                  Become a Seller
-                </Link>
-              )}
-              {contributorLinks}
-
-              <div className="mx-1.5 h-5 w-px bg-slate-200" />
-
               <Link
                 href="/wishlist"
                 aria-label="Wishlist"
@@ -237,12 +230,14 @@ export default function Navbar() {
                   onClick={() => setUserMenuOpen((open) => !open)}
                   aria-haspopup="menu"
                   aria-expanded={userMenuOpen}
+                  aria-label="Account menu"
                   className="flex items-center gap-2 rounded-full py-1 pl-1 pr-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
                 >
                   <span title={user.email} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[13px] font-semibold text-white select-none">
                     {avatarLabel}
                   </span>
-                  <span className="max-w-24 truncate">{firstName}</span>
+                  {/* Name only from xl — at lg the search box needs the room. */}
+                  <span className="hidden max-w-24 truncate xl:inline">{firstName}</span>
                   <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform ${userMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m6 9 6 6 6-6" />
                   </svg>
@@ -261,6 +256,11 @@ export default function Navbar() {
                   <Link href="/profile" onClick={() => setUserMenuOpen(false)} className="block px-3.5 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900">
                     My Profile
                   </Link>
+                  {accountLinks.map((link) => (
+                    <Link key={link.href} href={link.href} onClick={() => setUserMenuOpen(false)} className="block px-3.5 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                      {link.label}
+                    </Link>
+                  ))}
                   <Link href="/wishlist" onClick={() => setUserMenuOpen(false)} className="block px-3.5 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900">
                     Wishlist
                   </Link>
@@ -321,7 +321,7 @@ export default function Navbar() {
             onClick={() => setDrawerOpen(false)}
             className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
           />
-          <div className="absolute right-0 top-0 flex h-full w-[85%] max-w-sm flex-col overflow-y-auto bg-white shadow-2xl">
+          <div role="dialog" aria-modal="true" aria-label="Menu" className="absolute right-0 top-0 flex h-full w-[85%] max-w-sm flex-col overflow-y-auto bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
               <span className="text-[17px] font-semibold text-indigo-700">📚 BookMandu</span>
               <button
@@ -368,21 +368,17 @@ export default function Navbar() {
             {user ? (
               <>
                 <nav className="flex flex-col gap-0.5 px-3">
-                  <Link href="/orders" onClick={() => setDrawerOpen(false)} className="rounded-md px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-100">
-                    My orders
-                  </Link>
                   <Link href="/profile" onClick={() => setDrawerOpen(false)} className="rounded-md px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-100">
                     My Profile
                   </Link>
                   <Link href="/settings" onClick={() => setDrawerOpen(false)} className="rounded-md px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-100">
                     Settings
                   </Link>
-                  {user.role === "BUYER" && (
-                    <Link href="/become-seller" onClick={() => setDrawerOpen(false)} className="rounded-md px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-100">
-                      Become a Seller
+                  {accountLinks.map((link) => (
+                    <Link key={link.href} href={link.href} onClick={() => setDrawerOpen(false)} className="rounded-md px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-100">
+                      {link.label}
                     </Link>
-                  )}
-                  {contributorLinks}
+                  ))}
                 </nav>
 
                 <div className="mt-auto flex items-center gap-3 border-t border-slate-100 px-5 py-4">
